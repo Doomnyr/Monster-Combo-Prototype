@@ -5,22 +5,26 @@ using System.Linq;
 
 public class CombatManager : MonoBehaviour
 {
-    private List<MonsterInstance> _playerTeam = new List<MonsterInstance>();
-    private List<MonsterInstance> _enemyTeam = new List<MonsterInstance>();
+    public List<MonsterInstance> PlayerTeam { get; private set; } = new List<MonsterInstance>();
+    public List<MonsterInstance> EnemyTeam { get; private set; } = new List<MonsterInstance>();
 
     private List<MonsterInstance> _turnTimeline = new List<MonsterInstance>();
     private int _currentTimelineIndex = 0;
 
+    public event Action OnCombatDataReady;
+
     public void PrepareMatch(List<MonsterInstance> readyPlayerTeam, List<MonsterInstance> readyEnemyTeam)
     {
-        _playerTeam = readyPlayerTeam;
-        _enemyTeam = readyEnemyTeam;
+        PlayerTeam = readyPlayerTeam;
+        EnemyTeam = readyEnemyTeam;
 
         Debug.Log("CombatManager: Teams received. Generating timeline...");
         
         GenerateTurnTimeline();
         StartMatch();
         PrintMonsterInstances();
+
+        OnCombatDataReady?.Invoke();
     }
 
     private void GenerateTurnTimeline()
@@ -28,8 +32,8 @@ public class CombatManager : MonoBehaviour
         _turnTimeline.Clear();
         _currentTimelineIndex = 0;
 
-        _turnTimeline.AddRange(_playerTeam);
-        _turnTimeline.AddRange(_enemyTeam);
+        _turnTimeline.AddRange(PlayerTeam);
+        _turnTimeline.AddRange(EnemyTeam);
 
 
         _turnTimeline = _turnTimeline.OrderByDescending(monster => monster.MonsterDef.BaseStats.speed).ToList();

@@ -16,7 +16,7 @@ public struct GridPosition
 }
 
 [System.Serializable]
-public class MonsterInstance
+public class MonsterInstance : IHealthObservable, IManaObservable
 {
     // Identity & Setup
     public string InstanceId { get; private set; }
@@ -26,10 +26,35 @@ public class MonsterInstance
     // Position on the 2x3 Grid
     public GridPosition Position { get; set; }
 
-    // Live Resources Only
-    public float CurrentHP { get; set; }
-    public float CurrentMana { get; set; }
-    public bool IsDead => CurrentHP <= 0;
+    public float MaxHP => MonsterDef.BaseStats.maxHP;
+    public float MaxMana => MonsterDef.BaseStats.maxMana;
+    public bool IsDefeated => CurrentHP <= 0;
+    
+    public event Action<float, float> OnHPChanged;
+    public event Action<float, float> OnManaChanged;
+
+// --- Backing Fields & Mutators ---
+    private float currentHP;
+    public float CurrentHP
+    {
+        get => currentHP;
+        set
+        {
+            currentHP = Math.Clamp(value, 0f, MaxHP);
+            OnHPChanged?.Invoke(currentHP, MaxHP);
+        }
+    }
+
+    private float currentMana;
+    public float CurrentMana
+    {
+        get => currentMana;
+        set
+        {
+            currentMana = Math.Clamp(value, 0f, MaxMana);
+            OnManaChanged?.Invoke(currentMana, MaxMana);
+        }
+    }
 
     public MonsterInstance(MonsterDefinition monsterDef, CombatTeam team, GridPosition startingPosition)
     {
