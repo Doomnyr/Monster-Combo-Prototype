@@ -47,10 +47,11 @@ public class MonsterDefinition : ScriptableObject
 
     [Header("AI Command Priority List")]
     [Tooltip("The engine reads this from top to bottom. It will execute the first skill it can afford and/or is valid.")]
-    //[SerializeField] private List<SkillDefinition> commandPriorityList = new List<SkillDefinition>();
+    [SerializeField] private List<SkillDefinition> commandPriorityList = new List<SkillDefinition>();
 
     public string MonsterName => monsterName;
     public MonsterRace Race => race;
     public MonsterElement Element => element;
     public StatBlock BaseStats => baseStats;
+    public List<SkillDefinition> UsableSkills => usableSkills;
 }
