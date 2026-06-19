@@ -19,8 +19,10 @@ MonoBehaviour:
     maxHP: 200
     maxMana: 100
     attack: 75
-    defense: 100
+    defense: 1
     intelligence: 20
     speed: 20
     critChance: 0.05
     critDamageMult: 1.5
+  commandPriorityList:
+  - {fileID: 11400000, guid: 56b40c84422297b4ea99abb68f5dcb1f, type: 2}

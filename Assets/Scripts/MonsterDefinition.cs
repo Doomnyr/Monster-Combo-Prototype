@@ -53,5 +53,5 @@ public class MonsterDefinition : ScriptableObject
     public MonsterRace Race => race;
     public MonsterElement Element => element;
     public StatBlock BaseStats => baseStats;
-    public List<SkillDefinition> UsableSkills => usableSkills;
+    public List<SkillDefinition> CommandPriorityList => commandPriorityList;
 }
