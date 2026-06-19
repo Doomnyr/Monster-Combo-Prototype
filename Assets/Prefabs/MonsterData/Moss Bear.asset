@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d4d675410e554c346beddfb05de04bff, type: 3}
   m_Name: Moss Bear
   m_EditorClassIdentifier: Assembly-CSharp::MonsterDefinition
-  monsterName: Moss Bear
+  monsterName: 3 Moss Bear
   race: 0
   element: 2
   baseStats:

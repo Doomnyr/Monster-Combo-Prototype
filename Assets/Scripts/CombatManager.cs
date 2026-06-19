@@ -239,6 +239,62 @@ private void ExecuteNextTurn()
             case TargetScope.BotLaneAlly:
                 targets.AddRange(livingAllies.FindAll(m => m.GridPosition.Row == 2));
                 break;
+
+            case TargetScope.RandomFrontRowEnemyThenRandomBackRowEnemy:
+                List<MonsterInstance> preferredFrontEnemies = livingEnemies.FindAll(m => m.GridPosition.Column == 0);
+                if (preferredFrontEnemies.Count > 0)
+                {
+                    targets.Add(preferredFrontEnemies[UnityEngine.Random.Range(0, preferredFrontEnemies.Count)]);
+                }
+                else // Fallback to Back Row if Front Row is empty
+                {
+                    List<MonsterInstance> fallbackBackEnemies = livingEnemies.FindAll(m => m.GridPosition.Column == 1);
+                    if (fallbackBackEnemies.Count > 0)
+                        targets.Add(fallbackBackEnemies[UnityEngine.Random.Range(0, fallbackBackEnemies.Count)]);
+                }
+                break;
+
+            case TargetScope.RandomBackRowEnemyThenRandomFrontRowEnemy:
+                List<MonsterInstance> preferredBackEnemies = livingEnemies.FindAll(m => m.GridPosition.Column == 1);
+                if (preferredBackEnemies.Count > 0)
+                {
+                    targets.Add(preferredBackEnemies[UnityEngine.Random.Range(0, preferredBackEnemies.Count)]);
+                }
+                else // Fallback to Front Row if Back Row is empty
+                {
+                    List<MonsterInstance> fallbackFrontEnemies = livingEnemies.FindAll(m => m.GridPosition.Column == 0);
+                    if (fallbackFrontEnemies.Count > 0)
+                        targets.Add(fallbackFrontEnemies[UnityEngine.Random.Range(0, fallbackFrontEnemies.Count)]);
+                }
+                break;
+
+            case TargetScope.RandomFrontRowAllyThenRandomBackRowAlly:
+                List<MonsterInstance> preferredFrontAllies = livingAllies.FindAll(m => m.GridPosition.Column == 0);
+                if (preferredFrontAllies.Count > 0)
+                {
+                    targets.Add(preferredFrontAllies[UnityEngine.Random.Range(0, preferredFrontAllies.Count)]);
+                }
+                else // Fallback to Back Row
+                {
+                    List<MonsterInstance> fallbackBackAllies = livingAllies.FindAll(m => m.GridPosition.Column == 1);
+                    if (fallbackBackAllies.Count > 0)
+                        targets.Add(fallbackBackAllies[UnityEngine.Random.Range(0, fallbackBackAllies.Count)]);
+                }
+                break;
+
+            case TargetScope.RandomBackRowAllyThenRandomFrontRowAlly:
+                List<MonsterInstance> preferredBackAllies = livingAllies.FindAll(m => m.GridPosition.Column == 1);
+                if (preferredBackAllies.Count > 0)
+                {
+                    targets.Add(preferredBackAllies[UnityEngine.Random.Range(0, preferredBackAllies.Count)]);
+                }
+                else // Fallback to Front Row
+                {
+                    List<MonsterInstance> fallbackFrontAllies = livingAllies.FindAll(m => m.GridPosition.Column == 0);
+                    if (fallbackFrontAllies.Count > 0)
+                        targets.Add(fallbackFrontAllies[UnityEngine.Random.Range(0, fallbackFrontAllies.Count)]);
+                }
+                break;
         }
 
         return targets;

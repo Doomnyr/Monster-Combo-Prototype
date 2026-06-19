@@ -24,7 +24,7 @@ MonoBehaviour:
     - rid: 4509392300467814638
       type: {class: DamageEffect, ns: , asm: Assembly-CSharp}
       data:
-        _targetScope: 3
+        _targetScope: 19
         _attackMultiplier: 1
     - rid: 4509392300467814639
       type: {class: ModifyManaEffect, ns: , asm: Assembly-CSharp}

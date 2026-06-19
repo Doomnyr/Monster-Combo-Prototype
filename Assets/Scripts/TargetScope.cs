@@ -18,6 +18,10 @@ public enum TargetScope
     AllBackRowAlly,         
     TopLaneAlly,
     MidLaneAlly,
-    BotLaneAlly
+    BotLaneAlly,
+    RandomFrontRowEnemyThenRandomBackRowEnemy,
+    RandomBackRowEnemyThenRandomFrontRowEnemy,
+    RandomFrontRowAllyThenRandomBackRowAlly,
+    RandomBackRowAllyThenRandomFrontRowAlly
 
 }

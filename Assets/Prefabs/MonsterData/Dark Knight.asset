@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d4d675410e554c346beddfb05de04bff, type: 3}
   m_Name: Dark Knight
   m_EditorClassIdentifier: Assembly-CSharp::MonsterDefinition
-  monsterName: Dark Knight
+  monsterName: 1 Dark Knight
   race: 2
   element: 5
   baseStats:
