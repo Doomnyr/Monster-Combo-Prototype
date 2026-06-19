@@ -34,7 +34,7 @@ public class CombatUIController : MonoBehaviour
 {
     foreach (var monster in teamData)
     {
-        int targetUiIndex = (monster.Position.Row * 2) + monster.Position.Column;
+        int targetUiIndex = (monster.GridPosition.Row * 2) + monster.GridPosition.Column;
 
         if (targetUiIndex >= 0 && targetUiIndex < uiSlots.Count)
         {

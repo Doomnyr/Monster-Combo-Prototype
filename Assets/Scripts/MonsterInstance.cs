@@ -24,11 +24,12 @@ public class MonsterInstance : IHealthObservable, IManaObservable
     public CombatTeam Team { get; private set; }
     
     // Position on the 2x3 Grid
-    public GridPosition Position { get; set; }
+    public GridPosition gridPosition { get; set; }
 
     public float MaxHP => MonsterDef.BaseStats.maxHP;
     public float MaxMana => MonsterDef.BaseStats.maxMana;
     public bool IsDefeated => CurrentHP <= 0;
+    public GridPosition GridPosition => gridPosition;
     
     public event Action<float, float> OnHPChanged;
     public event Action<float, float> OnManaChanged;
@@ -61,7 +62,7 @@ public class MonsterInstance : IHealthObservable, IManaObservable
         MonsterDef = monsterDef ?? throw new ArgumentNullException(nameof(monsterDef));
         InstanceId = Guid.NewGuid().ToString();
         Team = team;
-        Position = startingPosition;
+        gridPosition = startingPosition;
 
         CurrentHP = monsterDef.BaseStats.maxHP;
         CurrentMana = monsterDef.BaseStats.maxMana;
