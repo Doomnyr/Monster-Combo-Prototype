@@ -15,11 +15,11 @@ public class TargetFrontRowFirst_Enemy_Random : TargetFinderSO
         {
             if (monster.Team != caster.Team && !monster.IsDefeated)
             {
-                if (monster.gridPosition.Row == 0)
+                if (monster.gridPosition.Column == 0)
                 {
                     validFrontlineEnemies.Add(monster);
                 }
-                else if (monster.gridPosition.Row == 1)
+                else if (monster.gridPosition.Column == 1)
                 {
                     validBacklineEnemies.Add(monster);
                 }

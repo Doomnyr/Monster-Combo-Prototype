@@ -9,7 +9,6 @@ public class CombatManager : MonoBehaviour
     public List<MonsterInstance> PlayerTeam { get; private set; } = new List<MonsterInstance>();
     public List<MonsterInstance> EnemyTeam { get; private set; } = new List<MonsterInstance>();
 
-    private List<MonsterInstance> _turnTimeline = new List<MonsterInstance>();
     private Queue<MonsterInstance> _turnQueue = new Queue<MonsterInstance>();
 
 
@@ -36,7 +35,7 @@ public class CombatManager : MonoBehaviour
 
     public void PrintMonsterInstances()
     {
-        List<MonsterInstance> allMonsters = _turnTimeline;
+        Queue<MonsterInstance> allMonsters = _turnQueue;
 
         foreach (var monster in allMonsters)
         {
@@ -86,14 +85,12 @@ public class CombatManager : MonoBehaviour
         Debug.Log($"Turn queue built with {_turnQueue.Count} monsters. Press SPACE to execute turns.");
     }
 
-    private void ExecuteNextTurn()
-    {/*
+private void ExecuteNextTurn()
+    {
         if (_turnQueue.Count == 0) return;
 
-        // 1. Get the monster whose turn it currently is
         MonsterInstance activeMonster = _turnQueue.Dequeue();
 
-        // Skip defeated monsters
         if (activeMonster.IsDefeated)
         {
             ExecuteNextTurn();
@@ -107,19 +104,32 @@ public class CombatManager : MonoBehaviour
             _turnQueue.Enqueue(activeMonster); 
             return;
         }
+        
         SkillDefinitionSO chosenSkill = activeMonster.MonsterDef.CommandPriorityList[0];
+        Debug.Log($"--- [TURN] {activeMonster.MonsterDef.MonsterName} is using {chosenSkill.SkillName}! ---");
 
-        Debug.Log($"[TURN] {activeMonster.MonsterDef.MonsterName} is using {chosenSkill.SkillName}!");
+        // Combine teams into one master list to pass to our TargetFinders
+        List<MonsterInstance> battlefield = new List<MonsterInstance>();
+        battlefield.AddRange(PlayerTeam);
+        battlefield.AddRange(EnemyTeam);
 
-        // 3. Loop through effects and let each effect pull its own distinct target list
-        foreach (SkillEffect effect in chosenSkill.ExecutionEffects)
+        // 3. Loop through the paired actions (The Magic Happens Here)
+        foreach (SkillAction action in chosenSkill.Actions)
         {
-            // Dynamically resolve targets specifically for this individual effect block
-            List<MonsterInstance> targets = ResolveTargets(activeMonster, effect.TargetScope);
-
-            if (targets.Count > 0)
+            // Safety check in case you forgot to plug an asset into the inspector slot
+            if (action.targetFinder == null || action.executionEffect == null)
             {
-                effect.Execute(activeMonster, targets);
+                Debug.LogWarning($"A SkillAction in {chosenSkill.SkillName} is missing a finder or effect asset!");
+                continue;
+            }
+
+            // A. Ask the Radar (TargetFinder) who to hit
+            List<MonsterInstance> targets = action.targetFinder.FindTargets(activeMonster, battlefield);
+
+            // B. Drop the Payload (SkillEffect) on every target found
+            foreach (MonsterInstance target in targets)
+            {
+                action.executionEffect.Apply(activeMonster, target);
             }
         }
 
@@ -127,7 +137,7 @@ public class CombatManager : MonoBehaviour
         if (!activeMonster.IsDefeated)
         {
             _turnQueue.Enqueue(activeMonster);
-        }*/
+        }
     }
 
 }
