@@ -1,29 +1,20 @@
-using System;
-using System.Collections.Generic;
 using UnityEngine;
 
-[Serializable]
-public class DamageEffect : SkillEffect
+[CreateAssetMenu(fileName = "Effect_Damage", menuName = "Combat/Effects/Damage")]
+public class DamageEffect : SkillEffectSO
 {
-    [Tooltip("Multiplier scaled against the caster's attack parameter.")]
-    [SerializeField] private float _attackMultiplier = 1.0f;
+    [Tooltip("Base power of the attack before modifiers.")]
+    [SerializeField] float _damageMultiplier = 1.0f;
 
-    public override void Execute(MonsterInstance caster, List<MonsterInstance> targets)
+    public override void Apply(MonsterInstance caster, MonsterInstance target)
     {
-        float totalAttack = caster.MonsterDef.BaseStats.attack * _attackMultiplier;
+        if (target.IsDefeated) return;
 
-        // Loop through every target provided by the targeting system
-        foreach (MonsterInstance target in targets)
-        {
-            if (target == null || target.IsDefeated) continue;
-
-            float totalDefense = target.MonsterDef.BaseStats.defense;
-            
-            // Ensure damage never drops below 1 point
-            float damageDealt = Mathf.Max(1f, totalAttack - totalDefense);
-            
-            target.CurrentHP -= damageDealt;
-            Debug.Log($"[Skill Engine] {caster.MonsterDef.MonsterName} dealt {damageDealt} damage to {target.MonsterDef.MonsterName}.");
-        }
+        // Update this damage calculator
+        float finalDamage = caster.MonsterDef.BaseStats.attack * _damageMultiplier - target.MonsterDef.BaseStats.defense;
+        finalDamage = Mathf.Max(1, finalDamage);
+        target.TakeDamage((int)finalDamage);
+        
+        Debug.Log($"{caster.MonsterDef.MonsterName} dealt {finalDamage} damage to {target.MonsterDef.MonsterName}!");
     }
 }

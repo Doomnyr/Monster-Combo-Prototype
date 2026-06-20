@@ -11,13 +11,16 @@ public class SkillDefinitionSO : ScriptableObject
     [Header("Requirements")]
     [SerializeField] private float manaCost;
 
-    // [SerializeReference] tells Unity to draw an interface picker for abstract/polymorphic sub-types
-    [SerializeReference] 
-    private List<SkillEffect> _executionEffects = new List<SkillEffect>();
+    [Header("Skill Sequence")]
+    [Tooltip("The steps this skill takes when executed, in order.")]
+    [SerializeField] 
+    private List<SkillAction> _actions = new List<SkillAction>();
 
     // Clean public contracts
     public string SkillName => skillName;
     public string Description => description;
     public float ManaCost => manaCost;
-    public List<SkillEffect> ExecutionEffects => _executionEffects;
+    
+    // This exposes your new paired actions to the Combat Manager
+    public List<SkillAction> Actions => _actions; 
 }

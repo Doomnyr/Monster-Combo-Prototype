@@ -1,4 +1,5 @@
 using System;
+using UnityEngine;
 
 public enum CombatTeam { Player, Enemy }
 
@@ -55,6 +56,30 @@ public class MonsterInstance : IHealthObservable, IManaObservable
             currentMana = Math.Clamp(value, 0f, MaxMana);
             OnManaChanged?.Invoke(currentMana, MaxMana);
         }
+    }
+    public void TakeDamage(int damageAmount)
+    {
+        // 1. Subtract the damage from current health
+        CurrentHP -= damageAmount;
+
+        // 2. Clamp the health so it doesn't go below 0
+        if (CurrentHP < 0)
+        {
+            CurrentHP = 0;
+        }
+
+        Debug.Log($"{this.MonsterDef.MonsterName} took {damageAmount} damage! Current HP: {CurrentHP}/{MaxHP}");
+
+        // 3. Handle death if health hits zero
+        if (CurrentHP == 0)
+        {
+            Die();
+        }
+    }
+
+    private void Die()
+    {
+        Debug.Log($"{this.MonsterDef.MonsterName} has fainted!");
     }
 
     public MonsterInstance(MonsterDefinitionSO monsterDef, CombatTeam team, GridPosition startingPosition)
