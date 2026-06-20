@@ -2,7 +2,7 @@
 using UnityEditor;
 using UnityEngine;
 
-[CustomEditor(typeof(SkillDefinition))]
+[CustomEditor(typeof(SkillDefinitionSO))]
 public class SkillDefinitionEditor : Editor
 {
     public override void OnInspectorGUI()
@@ -10,7 +10,7 @@ public class SkillDefinitionEditor : Editor
         // 1. Draw the normal inspector fields (Name, Description, Mana Cost, etc.)
         DrawDefaultInspector();
 
-        SkillDefinition skill = (SkillDefinition)target;
+        SkillDefinitionSO skill = (SkillDefinitionSO)target;
 
         GUILayout.Space(20);
         GUILayout.Label("Data-Driven Effect Factory", EditorStyles.boldLabel);

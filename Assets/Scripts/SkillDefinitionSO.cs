@@ -2,7 +2,7 @@ using UnityEngine;
 using System.Collections.Generic;
 
 [CreateAssetMenu(fileName = "NewSkill", menuName = "MonsterCombo/Skill Definition")]
-public class SkillDefinition : ScriptableObject
+public class SkillDefinitionSO : ScriptableObject
 {
     [Header("Identity Elements")]
     [SerializeField] private string skillName;

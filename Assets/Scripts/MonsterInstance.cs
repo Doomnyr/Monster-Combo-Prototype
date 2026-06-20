@@ -20,7 +20,7 @@ public class MonsterInstance : IHealthObservable, IManaObservable
 {
     // Identity & Setup
     public string InstanceId { get; private set; }
-    public MonsterDefinition MonsterDef { get; private set; }
+    public MonsterDefinitionSO MonsterDef { get; private set; }
     public CombatTeam Team { get; private set; }
     
     // Position on the 2x3 Grid
@@ -57,7 +57,7 @@ public class MonsterInstance : IHealthObservable, IManaObservable
         }
     }
 
-    public MonsterInstance(MonsterDefinition monsterDef, CombatTeam team, GridPosition startingPosition)
+    public MonsterInstance(MonsterDefinitionSO monsterDef, CombatTeam team, GridPosition startingPosition)
     {
         MonsterDef = monsterDef ?? throw new ArgumentNullException(nameof(monsterDef));
         InstanceId = Guid.NewGuid().ToString();

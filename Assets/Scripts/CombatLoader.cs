@@ -4,7 +4,7 @@ using System.Collections.Generic;
 [System.Serializable]
 public struct TeamSlotConfiguration
 {
-    public MonsterDefinition MonsterDef;
+    public MonsterDefinitionSO MonsterDef;
     public GridPosition GridPos; // Column (0-1), Row (0-2)
 }
 

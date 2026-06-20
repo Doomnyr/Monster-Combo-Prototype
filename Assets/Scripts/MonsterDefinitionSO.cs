@@ -35,7 +35,7 @@ public enum MonsterRace {
 }
 
 [CreateAssetMenu(fileName = "NewMonsterDefinition", menuName = "MonsterCombo/Monster Definition")]
-public class MonsterDefinition : ScriptableObject
+public class MonsterDefinitionSO : ScriptableObject
 {
     [Header("Monster Identity")]
     [SerializeField] private string monsterName;
@@ -47,11 +47,11 @@ public class MonsterDefinition : ScriptableObject
 
     [Header("AI Command Priority List")]
     [Tooltip("The engine reads this from top to bottom. It will execute the first skill it can afford and/or is valid.")]
-    [SerializeField] private List<SkillDefinition> commandPriorityList = new List<SkillDefinition>();
+    [SerializeField] private List<SkillDefinitionSO> commandPriorityList = new List<SkillDefinitionSO>();
 
     public string MonsterName => monsterName;
     public MonsterRace Race => race;
     public MonsterElement Element => element;
     public StatBlock BaseStats => baseStats;
-    public List<SkillDefinition> CommandPriorityList => commandPriorityList;
+    public List<SkillDefinitionSO> CommandPriorityList => commandPriorityList;
 }
