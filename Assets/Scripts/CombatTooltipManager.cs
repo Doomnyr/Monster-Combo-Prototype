@@ -13,10 +13,12 @@ public class CombatTooltipManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI statsText;
     [SerializeField] private TextMeshProUGUI buffsText;
 
-    [Header("Settings")]
-    [SerializeField] private Vector2 offset = new Vector2(15f, 15f);
+    [Header("Pin Settings")]
+    [SerializeField] private float screenMargin = 40f; // Gap between the tooltip and the screen edge
 
     private Canvas _canvas;
+    private RectTransform _panelRect;
+    private MonsterInstance _activeMonster;
 
     private void Awake()
     {
@@ -24,12 +26,22 @@ public class CombatTooltipManager : MonoBehaviour
         else Destroy(gameObject);
 
         _canvas = GetComponentInParent<Canvas>();
+        _panelRect = tooltipPanel.GetComponent<RectTransform>();
+
+        // Force anchors to the bottom-left (0,0) of the parent canvas so our manual positioning math works perfectly
+        if (_panelRect != null)
+        {
+            _panelRect.anchorMin = new Vector2(0f, 0f);
+            _panelRect.anchorMax = new Vector2(0f, 0f);
+            _panelRect.pivot = new Vector2(0f, 1f); // Force Top-Left pivot for vertical clamping math
+        }
+
         HideTooltip();
     }
 
     private void Update()
     {
-        if (tooltipPanel.activeSelf)
+        if (tooltipPanel.activeSelf && _activeMonster != null)
         {
             UpdateTooltipPosition();
         }
@@ -39,6 +51,7 @@ public class CombatTooltipManager : MonoBehaviour
     {
         if (monster == null) return;
 
+        _activeMonster = monster;
         tooltipPanel.SetActive(true);
         var baseStats = monster.MonsterDef.BaseStats;
 
@@ -76,6 +89,7 @@ public class CombatTooltipManager : MonoBehaviour
 
     public void HideTooltip()
     {
+        _activeMonster = null;
         tooltipPanel.SetActive(false);
     }
 
@@ -92,8 +106,48 @@ public class CombatTooltipManager : MonoBehaviour
         {
             mousePos = Pointer.current.position.ReadValue();
         }
-        
-        // Offset the window slightly so it doesn't clip directly underneath the mouse cursor
-        tooltipPanel.transform.position = mousePos + offset;
+
+        // Get the parent RectTransform (usually the Canvas RectTransform)
+        RectTransform parentRect = _panelRect.parent as RectTransform;
+        if (parentRect == null) return;
+
+        // Convert the screen mouse position into local space relative to the Canvas parent rect
+        Camera uiCamera = (_canvas.renderMode == RenderMode.ScreenSpaceOverlay) ? null : _canvas.worldCamera;
+        if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(parentRect, mousePos, uiCamera, out Vector2 localPoint))
+        {
+            return;
+        }
+
+        // Convert local point coordinate system so that (0,0) is strictly the bottom-left of the canvas
+        Vector2 localMousePosFromBottomLeft = localPoint - parentRect.rect.min;
+
+        float parentWidth = parentRect.rect.width;
+        float parentHeight = parentRect.rect.height;
+
+        float panelWidth = _panelRect.rect.width;
+        float panelHeight = _panelRect.rect.height;
+
+        float targetX = 0f;
+
+        // Determine if we are hovering over an Ally or an Enemy
+        string teamString = _activeMonster.Team.ToString().ToLower();
+        bool isAlly = teamString.Contains("ally") || teamString.Contains("player");
+
+        if (isAlly)
+        {
+            // Hovering Ally -> Show on the RIGHT side of the Canvas
+            targetX = parentWidth - panelWidth - screenMargin;
+        }
+        else
+        {
+            // Hovering Enemy -> Show on the LEFT side of the Canvas
+            targetX = screenMargin;
+        }
+
+        // Clamp the vertical Y position within the safe canvas bounds (using our Top-Left pivot rules)
+        float clampedY = Mathf.Clamp(localMousePosFromBottomLeft.y, panelHeight + screenMargin, parentHeight - screenMargin);
+
+        // Update the anchored position safely
+        _panelRect.anchoredPosition = new Vector2(targetX, clampedY);
     }
 }

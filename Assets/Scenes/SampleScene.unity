@@ -634,8 +634,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 50.0001, y: -52.7955}
-  m_SizeDelta: {x: 457.8197, y: 838.0032}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 450, y: 800}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &128443369
 MonoBehaviour:
@@ -1749,7 +1749,7 @@ MonoBehaviour:
   nameText: {fileID: 52441378}
   statsText: {fileID: 35834116}
   buffsText: {fileID: 1284410312}
-  offset: {x: 15, y: 15}
+  screenMargin: 0
 --- !u!1001 &1097673706
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2766,8 +2766,8 @@ RectTransform:
   m_LocalScale: {x: 0, y: 0, z: 0}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 1940209722}
   - {fileID: 1070565487}
+  - {fileID: 1940209722}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -3447,17 +3447,9 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 340251067}
     m_Modifications:
-    - target: {fileID: 319476274793087647, guid: fa84f8a2cb91dfb48a2d10d774a306a2, type: 3}
-      propertyPath: m_Sprite
-      value: 
-      objectReference: {fileID: 21300000, guid: 93c61a828689c894bbf872e81b3ae78e, type: 3}
     - target: {fileID: 1332264652860833553, guid: fa84f8a2cb91dfb48a2d10d774a306a2, type: 3}
       propertyPath: m_Name
       value: GridUISlot (0)
-      objectReference: {fileID: 0}
-    - target: {fileID: 2468785079231429174, guid: fa84f8a2cb91dfb48a2d10d774a306a2, type: 3}
-      propertyPath: m_TargetGraphic
-      value: 
       objectReference: {fileID: 0}
     - target: {fileID: 3937540450198140280, guid: fa84f8a2cb91dfb48a2d10d774a306a2, type: 3}
       propertyPath: m_AnchorMax.x
