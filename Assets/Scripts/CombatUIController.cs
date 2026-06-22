@@ -44,6 +44,12 @@ public class CombatUIController : MonoBehaviour
                 monster, // Implicitly cast to IHealthObservable
                 monster  // Implicitly cast to IManaObservable
             );
+
+            uiSlots[targetUiIndex].TryGetComponent<TooltipTrigger>(out var trigger);
+            trigger.SetupSlot(monster);
+
+
+
         }
     }
 }
