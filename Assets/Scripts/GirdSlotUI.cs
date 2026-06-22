@@ -9,6 +9,7 @@ public class GridSlotUI : MonoBehaviour
     [SerializeField] private Slider manaSlider;
     [SerializeField] private TextMeshProUGUI nameText;
     [SerializeField] private Image _monsterSprite;
+    [SerializeField] private GameObject _buffBar;
 
     // The visual slot holds references to the contracts, not the concrete class
     private IHealthObservable boundHealthTarget;
