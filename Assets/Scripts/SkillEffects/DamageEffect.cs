@@ -11,7 +11,7 @@ public class DamageEffect : SkillEffectSO
         if (target.IsDefeated) return;
 
         // Update this damage calculator
-        float finalDamage = caster.MonsterDef.BaseStats.attack * _damageMultiplier - target.MonsterDef.BaseStats.defense;
+        float finalDamage = caster.MonsterDef.BaseStats.strength * _damageMultiplier - target.MonsterDef.BaseStats.defense;
         finalDamage = Mathf.Max(1, finalDamage);
         target.TakeDamage((int)finalDamage);
         

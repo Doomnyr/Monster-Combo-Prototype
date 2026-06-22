@@ -33,15 +33,35 @@ public class CombatManager : MonoBehaviour
         Debug.Log("CombatManager: Match started!");
     }
 
-    public void PrintMonsterInstances()
+public void PrintMonsterInstances()
     {
         Queue<MonsterInstance> allMonsters = _turnQueue;
 
         foreach (var monster in allMonsters)
         {
-            // Gather references for cleaner string syntax
-            var stats = monster.MonsterDef.BaseStats;
+            var baseStats = monster.MonsterDef.BaseStats;
 
+            // 1. Build the Buffs/Debuffs display string dynamically
+            string buffString = "";
+            if (monster.ActiveBuffs == null || monster.ActiveBuffs.Count == 0)
+            {
+                buffString = "  (None)";
+            }
+            else
+            {
+                foreach (var buff in monster.ActiveBuffs)
+                {
+                    string durationText = buff.RemainingDuration == -1 ? "Permanent" : $"{buff.RemainingDuration} turns left";
+                    string typeTag = buff.BuffDef.isDebuff ? "[DEBUFF]" : "[BUFF]";
+                    
+                    buffString += $"  • {typeTag} {buff.BuffDef.buffName} x{buff.CurrentStacks} ({durationText})\n";
+                }
+                // Trim trailing newline for clean formatting
+                buffString = buffString.TrimEnd('\n');
+            }
+
+            // 2. Build the final profile layout
+            // Note: Changed stats.strength/defense to monster.Attack/Defense to see buff impacts!
             string monsterProfile = 
                 $"====== [ {monster.MonsterDef.MonsterName} ] ======\n" +
                 $"• Instance ID: {monster.InstanceId}\n" +
@@ -49,13 +69,16 @@ public class CombatManager : MonoBehaviour
                 $"• Grid Slot:   [Column {monster.GridPosition.Column}, Row {monster.GridPosition.Row}]\n" +
                 $"• Traits:      Race: {monster.MonsterDef.Race} | Element: {monster.MonsterDef.Element}\n" +
                 $"--------------------------------------------------\n" +
+                $"[Active Buffs / Debuffs]\n" +
+                $"{buffString}\n" +
+                $"--------------------------------------------------\n" +
                 $"[Current Vitals]\n" +
-                $"  - HP:   {monster.CurrentHP} / {stats.maxHP}\n" +
-                $"  - Mana: {monster.CurrentMana} / {stats.maxMana}\n" +
-                $"[Base Parameters]\n" +
-                $"  - ATK:  {stats.attack}  |  DEF:  {stats.defense}\n" +
-                $"  - INT:  {stats.intelligence}  |  SPD:  {stats.speed}\n" +
-                $"  - CRIT: {stats.critChance * 100}% |  MULT: {stats.critDamageMult}x\n" +
+                $"  - HP:   {monster.CurrentHP} / {baseStats.maxHP}\n" +
+                $"  - Mana: {monster.CurrentMana} / {baseStats.maxMana}\n" +
+                $"[Combat Parameters (Modified)]\n" +
+                $"  - ATK:  {monster.Strength} (Base: {baseStats.strength})  |  DEF:  {monster.Defense} (Base: {baseStats.defense})\n" +
+                $"  - INT:  {baseStats.intelligence}  |  SPD:  {baseStats.speed}\n" +
+                $"  - CRIT: {baseStats.critChance * 100}% |  MULT: {baseStats.critDamageMult}x\n" +
                 $"==================================================";
 
             Debug.Log(monsterProfile);
@@ -67,6 +90,7 @@ public class CombatManager : MonoBehaviour
         if (Keyboard.current != null && Keyboard.current.spaceKey.wasPressedThisFrame)
         {
             ExecuteNextTurn();
+            PrintMonsterInstances();
         }
     }
 
