@@ -1,11 +1,13 @@
 using UnityEngine;
 using System.Collections.Generic;
+using Microsoft.Unity.VisualStudio.Editor;
 
 [CreateAssetMenu(fileName = "NewMonsterDefinition", menuName = "MonsterCombo/Monster Definition")]
 public class MonsterDefinitionSO : ScriptableObject
 {
     [Header("Monster Identity")]
     [SerializeField] private string monsterName;
+    [SerializeField] private Sprite monsterSprite;
     [SerializeField] private MonsterRace race;
     [SerializeField] private MonsterElement element;
 
@@ -17,6 +19,7 @@ public class MonsterDefinitionSO : ScriptableObject
     [SerializeField] private List<SkillDefinitionSO> commandPriorityList = new List<SkillDefinitionSO>();
 
     public string MonsterName => monsterName;
+    public Sprite MonsterSprite => monsterSprite;
     public MonsterRace Race => race;
     public MonsterElement Element => element;
     public StatBlock BaseStats => baseStats;

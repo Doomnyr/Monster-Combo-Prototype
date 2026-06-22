@@ -4,10 +4,11 @@ using TMPro;
 
 public class GridSlotUI : MonoBehaviour
 {
-    [Header("UI Sliders")]
+    [Header("UI Components")]
     [SerializeField] private Slider healthSlider;
     [SerializeField] private Slider manaSlider;
     [SerializeField] private TextMeshProUGUI nameText;
+    [SerializeField] private Image _monsterSprite;
 
     // The visual slot holds references to the contracts, not the concrete class
     private IHealthObservable boundHealthTarget;
@@ -16,11 +17,12 @@ public class GridSlotUI : MonoBehaviour
     /// <summary>
     /// Binds the UI elements to any data entities that implement health and mana monitoring.
     /// </summary>
-    public void Bind(string displayName, IHealthObservable healthTarget, IManaObservable manaTarget)
+    public void Bind(string displayName, Sprite sprite, IHealthObservable healthTarget, IManaObservable manaTarget)
     {
         Unbind(); // Clean up existing listeners safely
 
         nameText.text = displayName;
+        _monsterSprite.sprite = sprite;
 
         // Bind Health Pipeline
         boundHealthTarget = healthTarget;

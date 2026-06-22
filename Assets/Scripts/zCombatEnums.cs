@@ -1,4 +1,8 @@
-public enum CombatTeam { Player, Enemy }
+public enum CombatTeam
+ { 
+    Player, 
+    Enemy
+    }
 
 [System.Serializable]
 public struct GridPosition

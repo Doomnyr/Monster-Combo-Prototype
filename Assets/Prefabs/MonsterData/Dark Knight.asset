@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Dark Knight
   m_EditorClassIdentifier: Assembly-CSharp::MonsterDefinition
   monsterName: 1 Dark Knight
+  monsterSprite: {fileID: 21300000, guid: 72f8aab2dd0d5ad419d9b5323f7e4267, type: 3}
   race: 2
   element: 5
   baseStats:

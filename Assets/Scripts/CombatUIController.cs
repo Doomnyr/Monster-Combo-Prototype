@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 public class CombatUIController : MonoBehaviour
 {
@@ -31,26 +32,25 @@ public class CombatUIController : MonoBehaviour
     }
 
     private void MatchTeamToUi(List<MonsterInstance> teamData, List<GridSlotUI> uiSlots)
-{
-    foreach (var monster in teamData)
     {
-        int targetUiIndex = (monster.GridPosition.Column * 3) + monster.GridPosition.Row;
-
-        if (targetUiIndex >= 0 && targetUiIndex < uiSlots.Count)
+        foreach (var monster in teamData)
         {
-            // We pass the same monster instance as both the health and mana observable target
-            uiSlots[targetUiIndex].Bind(
-                monster.MonsterDef.MonsterName, 
-                monster, // Implicitly cast to IHealthObservable
-                monster  // Implicitly cast to IManaObservable
-            );
+            int targetUiIndex = (monster.GridPosition.Column * 3) + monster.GridPosition.Row;
 
-            uiSlots[targetUiIndex].TryGetComponent<TooltipTrigger>(out var trigger);
-            trigger.SetupSlot(monster);
+            if (targetUiIndex >= 0 && targetUiIndex < uiSlots.Count)
+            {
+                // We pass the same monster instance as both the health and mana observable target
+                uiSlots[targetUiIndex].Bind(
+                    monster.MonsterDef.MonsterName,
+                    monster.MonsterDef.MonsterSprite, 
+                    monster, // Implicitly cast to IHealthObservable
+                    monster  // Implicitly cast to IManaObservable
+                );
 
-
-
+                uiSlots[targetUiIndex].TryGetComponent<TooltipTrigger>(out var trigger);
+                trigger.SetupSlot(monster);
+            }
         }
     }
-}
+
 }
