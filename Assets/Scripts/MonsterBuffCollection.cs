@@ -79,4 +79,36 @@ public class MonsterBuffCollection
     {
         return activeBuffs.RemoveAll(buff => buff.IsExpired) > 0;
     }
+
+    public float CalculateModifiedStat(StatType statType, float baseValue)
+    {
+        float flatBonus = 0f;
+        float percentBonus = 0f;
+        float multiplier = 1f;
+
+        foreach (var buff in activeBuffs)
+        {
+            foreach (var modifier in buff.BuffDef.statModifiers)
+            {
+                if (modifier.statToModify != statType) continue;
+
+                float totalModValue = modifier.valuePerStack * buff.CurrentStacks;
+                switch (modifier.modifierType)
+                {
+                    case ModifierType.FlatAdd:
+                        flatBonus += totalModValue;
+                        break;
+                    case ModifierType.PercentAdd:
+                        percentBonus += totalModValue;
+                        break;
+                    case ModifierType.PercentMultiply:
+                        multiplier *= Mathf.Pow(modifier.valuePerStack, buff.CurrentStacks);
+                        break;
+                }
+            }
+        }
+
+        float finalValue = (baseValue + flatBonus) * (1f + percentBonus) * multiplier;
+        return Mathf.Max(0f, finalValue);
+    }
 }

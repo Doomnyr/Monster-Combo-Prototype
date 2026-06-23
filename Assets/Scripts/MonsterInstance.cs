@@ -34,15 +34,15 @@ public class MonsterInstance : IHealthObservable, IManaObservable
 
     private void RecalculateDerivedStats()
     {
-        _cachedMaxHP = CalculateStat(StatType.MaxHP, MonsterDef.BaseStats.maxHP);
-        _cachedMaxMana = CalculateStat(StatType.MaxMana, MonsterDef.BaseStats.maxMana);
-        _cachedStrength = CalculateStat(StatType.Strength, MonsterDef.BaseStats.strength);
-        _cachedDefense = CalculateStat(StatType.Defense, MonsterDef.BaseStats.defense);
-        _cachedIntelligence = CalculateStat(StatType.Intelligence, MonsterDef.BaseStats.intelligence);
-        _cachedSpeed = CalculateStat(StatType.Speed, MonsterDef.BaseStats.speed);
-        _cachedCritChance = CalculateStat(StatType.CritChance, MonsterDef.BaseStats.critChance);
-        _cachedCritDamageMult = CalculateStat(StatType.CritDamageMult, MonsterDef.BaseStats.critDamageMult);
-        _cachedDodgeChance = CalculateStat(StatType.DodgeChance, MonsterDef.BaseStats.DodgeChance);
+        _cachedMaxHP = Buffs.CalculateModifiedStat(StatType.MaxHP, MonsterDef.BaseStats.maxHP);
+        _cachedMaxMana = Buffs.CalculateModifiedStat(StatType.MaxMana, MonsterDef.BaseStats.maxMana);
+        _cachedStrength = Buffs.CalculateModifiedStat(StatType.Strength, MonsterDef.BaseStats.strength);
+        _cachedDefense = Buffs.CalculateModifiedStat(StatType.Defense, MonsterDef.BaseStats.defense);
+        _cachedIntelligence = Buffs.CalculateModifiedStat(StatType.Intelligence, MonsterDef.BaseStats.intelligence);
+        _cachedSpeed = Buffs.CalculateModifiedStat(StatType.Speed, MonsterDef.BaseStats.speed);
+        _cachedCritChance = Buffs.CalculateModifiedStat(StatType.CritChance, MonsterDef.BaseStats.critChance);
+        _cachedCritDamageMult = Buffs.CalculateModifiedStat(StatType.CritDamageMult, MonsterDef.BaseStats.critDamageMult);
+        _cachedDodgeChance = Buffs.CalculateModifiedStat(StatType.DodgeChance, MonsterDef.BaseStats.DodgeChance);
 
         _currentHP = Math.Clamp(_currentHP, 0f, _cachedMaxHP);
         _currentMana = Math.Clamp(_currentMana, 0f, _cachedMaxMana);
@@ -128,40 +128,6 @@ public class MonsterInstance : IHealthObservable, IManaObservable
     public void TickBuffDurations()
     {
         Buffs.TickDurations();
-    }
-
-    private float CalculateStat(StatType statType, float baseValue)
-    {
-        float flatBonus = 0f;
-        float percentBonus = 0f;
-        float multiplier = 1f;
-
-        foreach (var buff in Buffs.ActiveBuffs)
-        {
-            foreach (var modifier in buff.BuffDef.statModifiers)
-            {
-                if (modifier.statToModify == statType)
-                {
-                    float totalModValue = modifier.valuePerStack * buff.CurrentStacks;
-
-                    switch (modifier.modifierType)
-                    {
-                        case ModifierType.FlatAdd:
-                            flatBonus += totalModValue;
-                            break;
-                        case ModifierType.PercentAdd:
-                            percentBonus += totalModValue;
-                            break;
-                        case ModifierType.PercentMultiply:
-                            multiplier *= Mathf.Pow(modifier.valuePerStack, buff.CurrentStacks);
-                            break;
-                    }
-                }
-            }
-        }
-
-        float finalValue = (baseValue + flatBonus) * (1f + percentBonus) * multiplier;
-        return Mathf.Max(0, finalValue);
     }
 
     public MonsterInstance(MonsterDefinitionSO monsterDef, CombatTeam team, GridPosition startingPosition)

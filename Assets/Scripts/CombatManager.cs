@@ -1,7 +1,6 @@
-using UnityEngine;
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class CombatManager : MonoBehaviour
@@ -35,33 +34,28 @@ public class CombatManager : MonoBehaviour
 
 public void PrintMonsterInstances()
     {
-        Queue<MonsterInstance> allMonsters = _turnQueue;
-
-        foreach (var monster in allMonsters)
+        foreach (var monster in _turnQueue)
         {
             var baseStats = monster.MonsterDef.BaseStats;
+            var buffs = monster.ActiveBuffs;
 
-            // 1. Build the Buffs/Debuffs display string dynamically
-            string buffString = "";
-            if (monster.ActiveBuffs == null || monster.ActiveBuffs.Count == 0)
+            string buffString;
+            if (buffs.Count == 0)
             {
                 buffString = "  (None)";
             }
             else
             {
-                foreach (var buff in monster.ActiveBuffs)
+                buffString = string.Empty;
+                foreach (var buff in buffs)
                 {
                     string durationText = buff.RemainingDuration == -1 ? "Permanent" : $"{buff.RemainingDuration} turns left";
                     string typeTag = buff.BuffDef.isDebuff ? "[DEBUFF]" : "[BUFF]";
-                    
                     buffString += $"  • {typeTag} {buff.BuffDef.buffName} x{buff.CurrentStacks} ({durationText})\n";
                 }
-                // Trim trailing newline for clean formatting
                 buffString = buffString.TrimEnd('\n');
             }
 
-            // 2. Build the final profile layout
-            // Note: Changed stats.strength/defense to monster.Attack/Defense to see buff impacts!
             string monsterProfile = 
                 $"====== [ {monster.MonsterDef.MonsterName} ] ======\n" +
                 $"• Instance ID: {monster.InstanceId}\n" +
@@ -73,12 +67,12 @@ public void PrintMonsterInstances()
                 $"{buffString}\n" +
                 $"--------------------------------------------------\n" +
                 $"[Current Vitals]\n" +
-                $"  - HP:   {monster.CurrentHP} / {baseStats.maxHP}\n" +
-                $"  - Mana: {monster.CurrentMana} / {baseStats.maxMana}\n" +
+                $"  - HP:   {monster.CurrentHP} / {monster.MaxHP}\n" +
+                $"  - Mana: {monster.CurrentMana} / {monster.MaxMana}\n" +
                 $"[Combat Parameters (Modified)]\n" +
                 $"  - ATK:  {monster.Strength} (Base: {baseStats.strength})  |  DEF:  {monster.Defense} (Base: {baseStats.defense})\n" +
-                $"  - INT:  {baseStats.intelligence}  |  SPD:  {baseStats.speed}\n" +
-                $"  - CRIT: {baseStats.critChance * 100}% |  MULT: {baseStats.critDamageMult}x\n" +
+                $"  - INT:  {baseStats.intelligence}  |  SPD:  {monster.Speed}\n" +
+                $"  - CRIT: {monster.CritChance * 100}% |  MULT: {monster.CritDamageMult}x\n" +
                 $"==================================================";
 
             Debug.Log(monsterProfile);
@@ -111,15 +105,14 @@ public void PrintMonsterInstances()
 
 private void ExecuteNextTurn()
     {
+        while (_turnQueue.Count > 0 && _turnQueue.Peek().IsDefeated)
+        {
+            _turnQueue.Dequeue();
+        }
+
         if (_turnQueue.Count == 0) return;
 
         MonsterInstance activeMonster = _turnQueue.Dequeue();
-
-        if (activeMonster.IsDefeated)
-        {
-            ExecuteNextTurn();
-            return;
-        }
 
         // 2. Grab its first skill (the Basic Attack)
         if (activeMonster.MonsterDef.CommandPriorityList.Count == 0)
