@@ -10,8 +10,11 @@ public class CombatManager : MonoBehaviour
 
     private Queue<MonsterInstance> _turnQueue = new Queue<MonsterInstance>();
 
-
     public event Action OnCombatDataReady;
+    public event Action<int> OnDamageTaken;
+    public event Action<int> OnHealed;
+    public event Action<BuffDefinitionSO, int> OnBuffApplied;
+    public event Action<BuffDefinitionSO> OnBuffRemoved;
 
     public void PrepareMatch(List<MonsterInstance> readyPlayerTeam, List<MonsterInstance> readyEnemyTeam)
     {
@@ -32,7 +35,7 @@ public class CombatManager : MonoBehaviour
         Debug.Log("CombatManager: Match started!");
     }
 
-public void PrintMonsterInstances()
+    public void PrintMonsterInstances()
     {
         foreach (var monster in _turnQueue)
         {
@@ -92,7 +95,6 @@ public void PrintMonsterInstances()
     {
         _turnQueue.Clear();
 
-        // Alternating entries between teams for a simple turn order demonstration
         int maxCount = Mathf.Max(PlayerTeam.Count, EnemyTeam.Count);
         for (int i = 0; i < maxCount; i++)
         {
@@ -103,7 +105,7 @@ public void PrintMonsterInstances()
         Debug.Log($"Turn queue built with {_turnQueue.Count} monsters. Press SPACE to execute turns.");
     }
 
-private void ExecuteNextTurn()
+    private void ExecuteNextTurn()
     {
         while (_turnQueue.Count > 0 && _turnQueue.Peek().IsDefeated)
         {
@@ -114,7 +116,17 @@ private void ExecuteNextTurn()
 
         MonsterInstance activeMonster = _turnQueue.Dequeue();
 
-        // 2. Grab its first skill (the Basic Attack)
+        // 1. Gather all living units on the battlefield for target finding
+        List<MonsterInstance> battlefield = new List<MonsterInstance>();
+        battlefield.AddRange(PlayerTeam);
+        battlefield.AddRange(EnemyTeam);
+
+        // 2. TRIGGER: OnTurnStart Buffs (e.g., Regen heals here!)
+        EvaluateBuffTriggers(activeMonster, BuffTriggerTime.OnTurnStart, battlefield);
+
+        if (activeMonster.IsDefeated) return; // Guard in case turn-start debuffs fainted them
+
+        // 3. Grab and use its first assigned skill
         if (activeMonster.MonsterDef.CommandPriorityList.Count == 0)
         {
             Debug.LogWarning($"{activeMonster.MonsterDef.MonsterName} has no skills assigned!");
@@ -125,39 +137,57 @@ private void ExecuteNextTurn()
         SkillDefinitionSO chosenSkill = activeMonster.MonsterDef.CommandPriorityList[0];
         Debug.Log($"--- [TURN] {activeMonster.MonsterDef.MonsterName} is using {chosenSkill.SkillName}! ---");
 
-        // Combine teams into one master list to pass to our TargetFinders
-        List<MonsterInstance> battlefield = new List<MonsterInstance>();
-        battlefield.AddRange(PlayerTeam);
-        battlefield.AddRange(EnemyTeam);
-
-        // 3. Loop through the paired actions (The Magic Happens Here)
         foreach (SkillAction action in chosenSkill.Actions)
         {
-            // Safety check in case you forgot to plug an asset into the inspector slot
-            if (action.targetFinder == null || action.executionEffect == null)
-            {
-                Debug.LogWarning($"A SkillAction in {chosenSkill.SkillName} is missing a finder or effect asset!");
-                continue;
-            }
-
-            // A. Ask the Radar (TargetFinder) who to hit
-            List<MonsterInstance> targets = action.targetFinder.FindTargets(activeMonster, battlefield);
-
-            // B. Drop the Payload (SkillEffect) on every target found
-            foreach (MonsterInstance target in targets)
-            {
-                action.executionEffect.Apply(activeMonster, target);
-            }
+            ExecuteSkillAction(action, activeMonster, battlefield);
         }
 
-        // Tick down status durations at the end of the monster's turn.
+        // 4. TRIGGER: OnTurnEnd Buffs (e.g., Poison ticks damage here!)
+        EvaluateBuffTriggers(activeMonster, BuffTriggerTime.OnTurnEnd, battlefield);
+
+        // 5. Tick down status durations at the end of the monster's turn
         activeMonster.TickBuffDurations();
 
-        // 4. Put the monster back at the end of the line for its next turn
+        // 6. Put the monster back at the end of the line if they survived
         if (!activeMonster.IsDefeated)
         {
             _turnQueue.Enqueue(activeMonster);
         }
     }
 
+    /// <summary>
+    /// Evaluates and runs active actions registered directly on the active unit's active buffs.
+    /// </summary>
+    private void EvaluateBuffTriggers(MonsterInstance monster, BuffTriggerTime triggerTime, List<MonsterInstance> battlefield)
+    {
+        List<SkillAction> triggeredActions = monster.GetTriggeredBuffActions(triggerTime);
+        if (triggeredActions.Count == 0) return;
+
+        Debug.Log($"[BUFF TRIGGER] Evaluating {triggerTime} triggers for {monster.MonsterDef.MonsterName}...");
+        foreach (SkillAction action in triggeredActions)
+        {
+            ExecuteSkillAction(action, monster, battlefield);
+        }
+    }
+
+    /// <summary>
+    /// Highly unified skill execution logic. Reused for both standard Skills AND Buff triggers!
+    /// </summary>
+    private void ExecuteSkillAction(SkillAction action, MonsterInstance caster, List<MonsterInstance> battlefield)
+    {
+        if (action.targetFinder == null || action.executionEffect == null)
+        {
+            Debug.LogWarning("Skipping Action: Missing finder or effect asset!");
+            return;
+        }
+
+        // A. Ask the Radar (TargetFinder) who to hit
+        List<MonsterInstance> targets = action.targetFinder.FindTargets(caster, battlefield);
+
+        // B. Drop the Payload (SkillEffect) on every target found
+        foreach (MonsterInstance target in targets)
+        {
+            action.executionEffect.Apply(caster, target);
+        }
+    }
 }

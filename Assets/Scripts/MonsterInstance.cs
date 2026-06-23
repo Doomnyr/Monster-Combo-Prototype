@@ -14,11 +14,16 @@ public class MonsterInstance : IHealthObservable, IManaObservable
     public GridPosition gridPosition { get; set; }
 
     public bool IsDefeated => CurrentHP <= 0;
+    public bool IsAlive => CurrentHP > 0;
     public GridPosition GridPosition => gridPosition;
 
     public event Action<float, float> OnHPChanged;
     public event Action<float, float> OnManaChanged;
-
+    public event Action<int> OnDamageTaken;
+    public event Action<int> OnHealed;
+    public event Action<BuffDefinitionSO, int> OnBuffApplied;  // (Buff, Stacks Added)
+    public event Action<BuffDefinitionSO> OnBuffRemoved;
+    
     public MonsterBuffCollection Buffs { get; private set; }
     public IReadOnlyList<BuffInstance> ActiveBuffs => Buffs.ActiveBuffs;
 
@@ -87,19 +92,25 @@ public class MonsterInstance : IHealthObservable, IManaObservable
 
     public void TakeDamage(int damageAmount)
     {
-        // 1. Subtract the damage from current health
         CurrentHP -= damageAmount;
 
-        // 2. Clamp the health so it doesn't go below 0
-        if (CurrentHP < 0)
-        {
-            CurrentHP = 0;
-        }
-
+        OnDamageTaken?.Invoke(damageAmount);
         Debug.Log($"{this.MonsterDef.MonsterName} took {damageAmount} damage! Current HP: {CurrentHP}/{MaxHP}");
 
-        // 3. Handle death if health hits zero
-        if (CurrentHP == 0)
+        if (CurrentHP <= 0)
+        {
+            Die();
+        }
+    }
+
+    public void TakeHeal(int healAmount)
+    {
+        CurrentHP -= healAmount;
+
+        OnHealed?.Invoke(healAmount);
+        Debug.Log($"{this.MonsterDef.MonsterName} was healed {healAmount}! Current HP: {CurrentHP}/{MaxHP}");
+
+        if (CurrentHP <= 0)
         {
             Die();
         }
@@ -130,6 +141,11 @@ public class MonsterInstance : IHealthObservable, IManaObservable
         Buffs.TickDurations();
     }
 
+    public List<SkillAction> GetTriggeredBuffActions(BuffTriggerTime triggerTime)
+    {
+        return Buffs.GetTriggeredActions(triggerTime);
+    }
+
     public MonsterInstance(MonsterDefinitionSO monsterDef, CombatTeam team, GridPosition startingPosition)
     {
         MonsterDef = monsterDef ?? throw new ArgumentNullException(nameof(monsterDef));
@@ -140,10 +156,11 @@ public class MonsterInstance : IHealthObservable, IManaObservable
         Buffs = new MonsterBuffCollection();
         Buffs.OnBuffsChanged += RecalculateDerivedStats;
 
+        Buffs.OnBuffApplied += (buffDef, stacks) => OnBuffApplied?.Invoke(buffDef, stacks);
+        Buffs.OnBuffRemoved += (buffDef) => OnBuffRemoved?.Invoke(buffDef);
+
         _currentHP = monsterDef.BaseStats.maxHP;
         _currentMana = monsterDef.BaseStats.maxMana;
         RecalculateDerivedStats();
     }
 }
-
-        

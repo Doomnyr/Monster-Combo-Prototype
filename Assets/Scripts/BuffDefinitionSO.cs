@@ -19,7 +19,7 @@ public class BuffDefinitionSO : ScriptableObject
 
     [Header("Active Triggers")]
     [Tooltip("Actions that happen at specific moments (like Poison at Turn End).")]
-    public List<StatusTriggerData> triggeredActions = new List<StatusTriggerData>();
+    public List<BuffTriggerData> triggeredActions = new List<BuffTriggerData>();
 }
 
 // --- Helper Structs for the Inspector ---
@@ -33,9 +33,9 @@ public struct StatModifierData
 }
 
 [Serializable]
-public struct StatusTriggerData
+public struct BuffTriggerData
 {
-    public StatusTriggerTime triggerTime;
+    public BuffTriggerTime triggerTime;
     
     [Tooltip("Reusing our SkillAction! E.g., TargetSelf + Effect_Damage")]
     public SkillAction actionToTrigger; 

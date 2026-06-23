@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using Unity.Loading;
 
 public class CombatUIController : MonoBehaviour
 {
@@ -48,6 +49,17 @@ public class CombatUIController : MonoBehaviour
                 );
 
                 uiSlots[targetUiIndex].TryGetComponent<TooltipTrigger>(out var trigger);
+                     
+                if (uiSlots[targetUiIndex].TryGetComponent<MonsterCombatVisuals>(out var visuals)) 
+                {
+                    Debug.Log("LoadingStatus visual combattext");
+                    visuals.SetupVisuals(monster);
+                }
+                else
+                {
+                    Debug.Log("Error finding visuals");
+                }
+
                 trigger.SetupSlot(monster);
             }
         }

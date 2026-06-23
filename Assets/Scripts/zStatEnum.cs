@@ -21,7 +21,7 @@ public enum ModifierType
     PercentMultiply// e.g., x1.5 Attack
 }
 
-public enum StatusTriggerTime
+public enum BuffTriggerTime
 {
     OnTurnStart,
     OnTurnEnd,

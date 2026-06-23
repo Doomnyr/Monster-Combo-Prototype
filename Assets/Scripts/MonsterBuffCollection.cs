@@ -10,6 +10,9 @@ public class MonsterBuffCollection
     public IReadOnlyList<BuffInstance> ActiveBuffs => activeBuffs.AsReadOnly();
 
     public event Action OnBuffsChanged;
+    public event Action<BuffDefinitionSO, int> OnBuffApplied;
+    public event Action<BuffDefinitionSO> OnBuffRemoved;
+    
 
     public bool AddBuff(BuffDefinitionSO buffDef, int stacks, int duration)
     {
@@ -31,6 +34,7 @@ public class MonsterBuffCollection
             activeBuffs.Add(new BuffInstance(buffDef, stacks, duration));
         }
 
+        OnBuffApplied?.Invoke(buffDef, stacks);
         OnBuffsChanged?.Invoke();
         return true;
     }
@@ -42,6 +46,7 @@ public class MonsterBuffCollection
         bool removed = activeBuffs.RemoveAll(buff => buff.BuffDef == buffDef) > 0;
         if (removed)
         {
+            OnBuffRemoved?.Invoke(buffDef);
             OnBuffsChanged?.Invoke();
         }
 
@@ -78,6 +83,29 @@ public class MonsterBuffCollection
     public bool RemoveExpiredBuffs()
     {
         return activeBuffs.RemoveAll(buff => buff.IsExpired) > 0;
+    }
+
+    /// <summary>
+    /// Gathers all SkillActions registered under a specific trigger window.
+    /// Multiplies execution runs if a buff stacks (optional, currently runs once per trigger).
+    /// </summary>
+    public List<SkillAction> GetTriggeredActions(BuffTriggerTime triggerTime)
+    {
+        List<SkillAction> actionsToRun = new List<SkillAction>();
+        foreach (var buff in activeBuffs)
+        {
+            foreach (var trigger in buff.BuffDef.triggeredActions)
+            {
+                if (trigger.triggerTime == triggerTime)
+                {
+                    // Run the action once per stack, or just once? 
+                    // For Poison (2% max HP per stack), the effect calculation handles multiplier,
+                    // so we only need to fire the action once.
+                    actionsToRun.Add(trigger.actionToTrigger);
+                }
+            }
+        }
+        return actionsToRun;
     }
 
     public float CalculateModifiedStat(StatType statType, float baseValue)
