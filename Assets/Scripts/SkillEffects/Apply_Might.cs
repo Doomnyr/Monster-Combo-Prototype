@@ -17,10 +17,8 @@ public class Effect_ApplyMight : SkillEffectSO
 
     public override void Apply(MonsterInstance caster, MonsterInstance target)
     {
-        if (!target.IsDefeated) return;
+        if (target.IsDefeated) return;
 
-        // Note: You will need to add a method on MonsterInstance like AddStatus()
-        // that creates the StatusInstance and holds it in a List<StatusInstance>
         target.AddBuff(buffToApply, stacksToApply, duration);
     }
 }

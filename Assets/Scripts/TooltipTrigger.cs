@@ -15,11 +15,9 @@ public class TooltipTrigger : MonoBehaviour, IPointerEnterHandler, IPointerExitH
 
     public void OnPointerEnter(PointerEventData eventData)
     {
-        
         if (_trackedMonster != null)
         {
-            Debug.Log("Mouse OVER!");
-            CombatTooltipManager.Instance.ShowTooltip(_trackedMonster);
+            CombatTooltipManager.Instance.ShowTooltip(_trackedMonster, eventData.position);
         }
     }
 

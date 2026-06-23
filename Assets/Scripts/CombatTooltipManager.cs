@@ -19,6 +19,7 @@ public class CombatTooltipManager : MonoBehaviour
     private Canvas _canvas;
     private RectTransform _panelRect;
     private MonsterInstance _activeMonster;
+    private Vector2 _lastHoverScreenPosition;
 
     private void Awake()
     {
@@ -47,11 +48,12 @@ public class CombatTooltipManager : MonoBehaviour
         }
     }
 
-    public void ShowTooltip(MonsterInstance monster)
+    public void ShowTooltip(MonsterInstance monster, Vector2 screenPosition)
     {
         if (monster == null) return;
 
         _activeMonster = monster;
+        _lastHoverScreenPosition = screenPosition;
         tooltipPanel.SetActive(true);
         var baseStats = monster.MonsterDef.BaseStats;
 
@@ -95,16 +97,18 @@ public class CombatTooltipManager : MonoBehaviour
 
     private void UpdateTooltipPosition()
     {
-        Vector2 mousePos = Vector2.zero;
+        Vector2 mousePos = _lastHoverScreenPosition;
 
-        // Safely poll the active pointing hardware using the New Input System
+        // Safely poll the active pointing hardware using the New Input System, but keep a fallback to the last known hover point.
         if (Mouse.current != null)
         {
             mousePos = Mouse.current.position.ReadValue();
+            _lastHoverScreenPosition = mousePos;
         }
         else if (Pointer.current != null)
         {
             mousePos = Pointer.current.position.ReadValue();
+            _lastHoverScreenPosition = mousePos;
         }
 
         // Get the parent RectTransform (usually the Canvas RectTransform)
@@ -129,18 +133,15 @@ public class CombatTooltipManager : MonoBehaviour
 
         float targetX = 0f;
 
-        // Determine if we are hovering over an Ally or an Enemy
-        string teamString = _activeMonster.Team.ToString().ToLower();
-        bool isAlly = teamString.Contains("ally") || teamString.Contains("player");
-
-        if (isAlly)
+        bool hoverOnLeft = mousePos.x < (parentWidth * 0.5f);
+        if (hoverOnLeft)
         {
-            // Hovering Ally -> Show on the RIGHT side of the Canvas
+            // Hovering on the left side => display the tooltip on the right.
             targetX = parentWidth - panelWidth - screenMargin;
         }
         else
         {
-            // Hovering Enemy -> Show on the LEFT side of the Canvas
+            // Hovering on the right side => display the tooltip on the left.
             targetX = screenMargin;
         }
 
