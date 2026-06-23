@@ -22,39 +22,65 @@ public class MonsterInstance : IHealthObservable, IManaObservable
     private List<BuffInstance> activeBuffs = new List<BuffInstance>();
     public List<BuffInstance> ActiveBuffs => activeBuffs;
 
+    private float _cachedMaxHP;
+    private float _cachedMaxMana;
+    private float _cachedStrength;
+    private float _cachedDefense;
+    private float _cachedIntelligence;
+    private float _cachedSpeed;
+    private float _cachedCritChance;
+    private float _cachedCritDamageMult;
+    private float _cachedDodgeChance;
+
+    private void RecalculateDerivedStats()
+    {
+        _cachedMaxHP = CalculateStat(StatType.MaxHP, MonsterDef.BaseStats.maxHP);
+        _cachedMaxMana = CalculateStat(StatType.MaxMana, MonsterDef.BaseStats.maxMana);
+        _cachedStrength = CalculateStat(StatType.Strength, MonsterDef.BaseStats.strength);
+        _cachedDefense = CalculateStat(StatType.Defense, MonsterDef.BaseStats.defense);
+        _cachedIntelligence = CalculateStat(StatType.Intelligence, MonsterDef.BaseStats.intelligence);
+        _cachedSpeed = CalculateStat(StatType.Speed, MonsterDef.BaseStats.speed);
+        _cachedCritChance = CalculateStat(StatType.CritChance, MonsterDef.BaseStats.critChance);
+        _cachedCritDamageMult = CalculateStat(StatType.CritDamageMult, MonsterDef.BaseStats.critDamageMult);
+        _cachedDodgeChance = CalculateStat(StatType.DodgeChance, MonsterDef.BaseStats.DodgeChance);
+
+        _currentHP = Math.Clamp(_currentHP, 0f, _cachedMaxHP);
+        _currentMana = Math.Clamp(_currentMana, 0f, _cachedMaxMana);
+    }
+
 // --- Backing Fields & Mutators ---
-    private float currentHP;
+    private float _currentHP;
     public float CurrentHP
     {
-        get => currentHP;
+        get => _currentHP;
         set
         {
-            currentHP = Math.Clamp(value, 0f, MaxHP);
-            OnHPChanged?.Invoke(currentHP, MaxHP);
+            _currentHP = Math.Clamp(value, 0f, MaxHP);
+            OnHPChanged?.Invoke(_currentHP, MaxHP);
         }
     }
 
-    private float currentMana;
+    private float _currentMana;
     public float CurrentMana
     {
-        get => currentMana;
+        get => _currentHP;
         set
         {
-            currentMana = Math.Clamp(value, 0f, MaxMana);
-            OnManaChanged?.Invoke(currentMana, MaxMana);
+            _currentMana = Math.Clamp(value, 0f, MaxMana);
+            OnManaChanged?.Invoke(_currentMana, MaxMana);
         }
     }
 
-    public float MaxHP => CalculateStat(StatType.MaxHP, MonsterDef.BaseStats.maxHP);
-    public float MaxMana => CalculateStat(StatType.MaxMana, MonsterDef.BaseStats.maxMana);
+    public float MaxHP => _cachedMaxHP;
+    public float MaxMana => _cachedMaxMana;
 
-    public float Strength => CalculateStat(StatType.Strength, MonsterDef.BaseStats.strength);
-    public float Defense => CalculateStat(StatType.Defense, MonsterDef.BaseStats.defense);
-    public float Intelligence => CalculateStat(StatType.Intelligence, MonsterDef.BaseStats.intelligence);
-    public float Speed => CalculateStat(StatType.Defense, MonsterDef.BaseStats.speed);
-    public float CritChance => CalculateStat(StatType.CritChance, MonsterDef.BaseStats.critChance);
-    public float CritDamageMult => CalculateStat(StatType.CritDamageMult, MonsterDef.BaseStats.critDamageMult);
-    public float DodgeChance => CalculateStat(StatType.DodgeChance, MonsterDef.BaseStats.DodgeChance);
+    public float Strength => _cachedStrength;
+    public float Defense => _cachedDefense;
+    public float Intelligence => _cachedIntelligence;
+    public float Speed => _cachedSpeed;
+    public float CritChance => _cachedCritChance;
+    public float CritDamageMult => _cachedCritDamageMult;
+    public float DodgeChance => _cachedDodgeChance;
     public void TakeDamage(int damageAmount)
     {
         // 1. Subtract the damage from current health
@@ -81,23 +107,25 @@ public class MonsterInstance : IHealthObservable, IManaObservable
     }
 
     public void AddBuff(BuffDefinitionSO buffDef, int stacks, int duration)
-{
-    // Check if we already have this exact buff
-    BuffInstance existingBuff = activeBuffs.Find(b => b.BuffDef == buffDef);
+    {
+        // Check if we already have this exact buff
+        BuffInstance existingBuff = activeBuffs.Find(b => b.BuffDef == buffDef);
 
-    if (existingBuff != null)
-    {
-        existingBuff.AddStacks(stacks);
-        // Optional: Refresh duration when re-applied
-        // existingBuff.RemainingDuration = duration; 
+        if (existingBuff != null)
+        {
+            existingBuff.AddStacks(stacks);
+            // Optional: Refresh duration when re-applied
+            // existingBuff.RemainingDuration = duration; 
+        }
+        else
+        {
+            BuffInstance newBuff = new BuffInstance(buffDef, stacks, duration);
+            activeBuffs.Add(newBuff);
+            Debug.Log($"{MonsterDef.MonsterName} received {buffDef.buffName}!");
+        }
+
+        RecalculateDerivedStats();
     }
-    else
-    {
-        BuffInstance newBuff = new BuffInstance(buffDef, stacks, duration);
-        activeBuffs.Add(newBuff);
-        Debug.Log($"{MonsterDef.MonsterName} received {buffDef.buffName}!");
-    }
-}
 
     private float CalculateStat(StatType statType, float baseValue)
     {
@@ -146,7 +174,8 @@ public class MonsterInstance : IHealthObservable, IManaObservable
         Team = team;
         gridPosition = startingPosition;
 
-        CurrentHP = monsterDef.BaseStats.maxHP;
-        CurrentMana = monsterDef.BaseStats.maxMana;
+        _currentHP = monsterDef.BaseStats.maxHP;
+        _currentMana = monsterDef.BaseStats.maxMana;
+        RecalculateDerivedStats();
     }
 }
