@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "TargetFrontRowFirst_Enemy_Random", menuName = "TargetFinder/TargetFrontRowFirst_Enemy_Random")]
-public class TargetSelf : TargetFinderSO
+[CreateAssetMenu(fileName = "TargetCaster", menuName = "TargetFinder/TargetCaster")]
+public class TargetCaster : TargetFinderSO
 {
     public override List<MonsterInstance> FindTargets(MonsterInstance caster, List<MonsterInstance> battlefield)
     {

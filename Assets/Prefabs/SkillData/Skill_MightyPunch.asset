@@ -16,5 +16,5 @@ MonoBehaviour:
   description: 
   manaCost: 10
   _actions:
-  - targetFinder: {fileID: 11400000, guid: 1987b1fcd2d464e418cf9da66e4bcac1, type: 2}
+  - targetFinder: {fileID: 11400000, guid: 74aee106783430b43b381bdbfd2e1037, type: 2}
     executionEffect: {fileID: 11400000, guid: ccfcc399a267a5e4ca1d97bfc55bad68, type: 2}

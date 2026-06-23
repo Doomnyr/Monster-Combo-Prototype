@@ -20,7 +20,7 @@ MonoBehaviour:
     maxHP: 100
     maxMana: 100
     strength: 100
-    defense: 1
+    defense: 50
     intelligence: 100
     speed: 100
     critChance: 0.05

@@ -9,6 +9,6 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c8b2cdb0a9db839468e44a82eea931db, type: 3}
-  m_Name: TargetSelf
-  m_EditorClassIdentifier: Assembly-CSharp::TargetFrontRowFirst_Enemy_Random
+  m_Script: {fileID: 11500000, guid: dbb65f3b494471a488594e01b0f9b3f5, type: 3}
+  m_Name: TargetCaster
+  m_EditorClassIdentifier: Assembly-CSharp::TargetSelf
