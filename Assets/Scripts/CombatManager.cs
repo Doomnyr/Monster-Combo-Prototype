@@ -157,6 +157,9 @@ private void ExecuteNextTurn()
             }
         }
 
+        // Tick down status durations at the end of the monster's turn.
+        activeMonster.TickBuffDurations();
+
         // 4. Put the monster back at the end of the line for its next turn
         if (!activeMonster.IsDefeated)
         {

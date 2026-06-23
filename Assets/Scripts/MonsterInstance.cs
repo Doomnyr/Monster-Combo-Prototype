@@ -9,18 +9,18 @@ public class MonsterInstance : IHealthObservable, IManaObservable
     public string InstanceId { get; private set; }
     public MonsterDefinitionSO MonsterDef { get; private set; }
     public CombatTeam Team { get; private set; }
-    
+
     // Position on the 2x3 Grid
     public GridPosition gridPosition { get; set; }
 
     public bool IsDefeated => CurrentHP <= 0;
     public GridPosition GridPosition => gridPosition;
-    
+
     public event Action<float, float> OnHPChanged;
     public event Action<float, float> OnManaChanged;
 
-    private List<BuffInstance> activeBuffs = new List<BuffInstance>();
-    public List<BuffInstance> ActiveBuffs => activeBuffs;
+    public MonsterBuffCollection Buffs { get; private set; }
+    public IReadOnlyList<BuffInstance> ActiveBuffs => Buffs.ActiveBuffs;
 
     private float _cachedMaxHP;
     private float _cachedMaxMana;
@@ -46,9 +46,12 @@ public class MonsterInstance : IHealthObservable, IManaObservable
 
         _currentHP = Math.Clamp(_currentHP, 0f, _cachedMaxHP);
         _currentMana = Math.Clamp(_currentMana, 0f, _cachedMaxMana);
+
+        OnHPChanged?.Invoke(_currentHP, _cachedMaxHP);
+        OnManaChanged?.Invoke(_currentMana, _cachedMaxMana);
     }
 
-// --- Backing Fields & Mutators ---
+    // --- Backing Fields & Mutators ---
     private float _currentHP;
     public float CurrentHP
     {
@@ -63,7 +66,7 @@ public class MonsterInstance : IHealthObservable, IManaObservable
     private float _currentMana;
     public float CurrentMana
     {
-        get => _currentHP;
+        get => _currentMana;
         set
         {
             _currentMana = Math.Clamp(value, 0f, MaxMana);
@@ -81,6 +84,7 @@ public class MonsterInstance : IHealthObservable, IManaObservable
     public float CritChance => _cachedCritChance;
     public float CritDamageMult => _cachedCritDamageMult;
     public float DodgeChance => _cachedDodgeChance;
+
     public void TakeDamage(int damageAmount)
     {
         // 1. Subtract the damage from current health
@@ -108,23 +112,22 @@ public class MonsterInstance : IHealthObservable, IManaObservable
 
     public void AddBuff(BuffDefinitionSO buffDef, int stacks, int duration)
     {
-        // Check if we already have this exact buff
-        BuffInstance existingBuff = activeBuffs.Find(b => b.BuffDef == buffDef);
+        Buffs.AddBuff(buffDef, stacks, duration);
+    }
 
-        if (existingBuff != null)
-        {
-            existingBuff.AddStacks(stacks);
-            // Optional: Refresh duration when re-applied
-            // existingBuff.RemainingDuration = duration; 
-        }
-        else
-        {
-            BuffInstance newBuff = new BuffInstance(buffDef, stacks, duration);
-            activeBuffs.Add(newBuff);
-            Debug.Log($"{MonsterDef.MonsterName} received {buffDef.buffName}!");
-        }
+    public bool RemoveBuff(BuffDefinitionSO buffDef)
+    {
+        return Buffs.RemoveBuff(buffDef);
+    }
 
-        RecalculateDerivedStats();
+    public bool SetBuffDuration(BuffDefinitionSO buffDef, int duration)
+    {
+        return Buffs.SetBuffDuration(buffDef, duration);
+    }
+
+    public void TickBuffDurations()
+    {
+        Buffs.TickDurations();
     }
 
     private float CalculateStat(StatType statType, float baseValue)
@@ -133,14 +136,12 @@ public class MonsterInstance : IHealthObservable, IManaObservable
         float percentBonus = 0f;
         float multiplier = 1f;
 
-        // Loop through all active buffs to find modifiers for THIS specific stat
-        foreach (var buff in activeBuffs)
+        foreach (var buff in Buffs.ActiveBuffs)
         {
             foreach (var modifier in buff.BuffDef.statModifiers)
             {
                 if (modifier.statToModify == statType)
                 {
-                    // Multiply the modifier value by the number of stacks!
                     float totalModValue = modifier.valuePerStack * buff.CurrentStacks;
 
                     switch (modifier.modifierType)
@@ -152,7 +153,6 @@ public class MonsterInstance : IHealthObservable, IManaObservable
                             percentBonus += totalModValue;
                             break;
                         case ModifierType.PercentMultiply:
-                            // For multiply, 1 stack of 1.5x = 1.5. 2 stacks = 1.5 * 1.5 = 2.25
                             multiplier *= Mathf.Pow(modifier.valuePerStack, buff.CurrentStacks);
                             break;
                     }
@@ -160,10 +160,7 @@ public class MonsterInstance : IHealthObservable, IManaObservable
             }
         }
 
-        // Standard RPG Math: (Base + Flat) * (1 + PercentBonus) * Multiplier
         float finalValue = (baseValue + flatBonus) * (1f + percentBonus) * multiplier;
-        
-        // Prevent stats from dropping below zero due to heavy debuffs
         return Mathf.Max(0, finalValue);
     }
 
@@ -174,8 +171,13 @@ public class MonsterInstance : IHealthObservable, IManaObservable
         Team = team;
         gridPosition = startingPosition;
 
+        Buffs = new MonsterBuffCollection();
+        Buffs.OnBuffsChanged += RecalculateDerivedStats;
+
         _currentHP = monsterDef.BaseStats.maxHP;
         _currentMana = monsterDef.BaseStats.maxMana;
         RecalculateDerivedStats();
     }
 }
+
+        

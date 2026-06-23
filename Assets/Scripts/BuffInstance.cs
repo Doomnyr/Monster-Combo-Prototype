@@ -35,5 +35,10 @@ public class BuffInstance
         }
     }
 
+    public void SetRemainingDuration(int duration)
+    {
+        RemainingDuration = Mathf.Max(0, duration);
+    }
+
     public bool IsExpired => RemainingDuration == 0;
 }
