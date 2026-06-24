@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 779c03b7f49a16e42a8fe337e68fe925, type: 3}
+  m_Name: CombatConfig
+  m_EditorClassIdentifier: Assembly-CSharp::CombatConfigSO
+  weaknessMultiplier: 1.5
+  masterVolume: 1
+  sfxVolume: 0.8
+  musicVolume: 0.5
+  overrideFloatingTextSettings: 1
+  floatingTextLifetime: 1.2
+  floatingTextUpwardSpeed: 75

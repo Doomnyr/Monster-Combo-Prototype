@@ -15,6 +15,7 @@ public struct StatBlock {
 // Traits
 
 public enum MonsterElement {
+    Default,
     Water,
     Fire,
     Nature,
