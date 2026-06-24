@@ -8,6 +8,7 @@ public class BuffDefinitionSO : ScriptableObject
     [Header("Identity")]
     public string buffName;
     public bool isDebuff; 
+    public Sprite buffIcon;
     
     [Header("Stacking Rules")]
     public int maxStacks = 1;

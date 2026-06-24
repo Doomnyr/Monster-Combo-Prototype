@@ -49,27 +49,27 @@ public class MonsterCombatVisuals : MonoBehaviour
 
     private void SpawnDamageText(int amount)
     {
-        CreateFloatingText($"-{amount}", damageColor);
+        CreateFloatingText($"-{amount}", damageColor, null);
     }
 
     private void SpawnHealText(int amount)
     {
-        CreateFloatingText($"+{amount}", healColor);
+        CreateFloatingText($"+{amount}", healColor, null);
     }
 
     private void SpawnBuffAppliedText(BuffDefinitionSO buff, int stacks)
-    {
+    {    
         Color textCol = buff.isDebuff ? debuffColor : buffColor;
         string prefix = buff.isDebuff ? "▼" : "▲";
-        CreateFloatingText($"{prefix} {buff.buffName} +{stacks}", textCol);
+        CreateFloatingText($"{prefix} {buff.buffName} +{stacks}", textCol, buff.buffIcon);
     }
 
     private void SpawnBuffRemovedText(BuffDefinitionSO buff)
     {
-        CreateFloatingText($"{buff.buffName} Expired", Color.gray);
+        CreateFloatingText($"{buff.buffName} Expired", Color.gray, buff.buffIcon);
     }
 
-    private void CreateFloatingText(string message, Color color)
+    private void CreateFloatingText(string message, Color color, Sprite buffIcon)
     {
         if (floatingTextPrefab == null) return;
 
@@ -79,7 +79,7 @@ public class MonsterCombatVisuals : MonoBehaviour
 
         if (textInstance.TryGetComponent<FloatingText>(out var flText))
         {
-            flText.Setup(message, color);
+            flText.Setup(message, color, buffIcon);
         }
     }
 }

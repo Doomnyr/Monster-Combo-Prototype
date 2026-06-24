@@ -4,11 +4,11 @@ using TMPro;
 public class FloatingText : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI textMesh;
+    [SerializeField] private UnityEngine.UI.Image iconImage;
     
     [Header("Movement Settings")]
     [SerializeField] private float lifetime = 1.0f;
     [SerializeField] private Vector2 moveSpeedRangeY = new Vector2(50f, 100f);
-    [SerializeField] private Vector2 moveSpeedRangeX = new Vector2(-30f, 30f);
     
     [Header("Bounce/Scale Curve")]
     [SerializeField] private AnimationCurve scaleCurve = AnimationCurve.EaseInOut(0, 0, 1, 1);
@@ -20,23 +20,42 @@ public class FloatingText : MonoBehaviour
 
     private void Awake()
     {
-        // Automatically looks down into child GameObjects to find the Text Mesh!
+        // Automatically looks down into child GameObjects to find the Text Mesh if unassigned!
         if (textMesh == null)
         {
             textMesh = GetComponentInChildren<TextMeshProUGUI>();
         }
+
+        // Automatically looks down into child GameObjects to find the Image component if unassigned!
+        if (iconImage == null)
+        {
+            iconImage = GetComponentInChildren<UnityEngine.UI.Image>();
+        }
     }
 
-    public void Setup(string text, Color color)
+    public void Setup(string text, Color color, Sprite buffIcon = null)
     {
         textMesh.text = text;
         textMesh.color = color;
         _baseColor = color;
 
-        // Choose a random upward bounce and slight random sideways drift
+        if (iconImage != null)
+        {
+            if (buffIcon != null)
+            {
+                iconImage.sprite = buffIcon;
+                iconImage.gameObject.SetActive(true);
+            }
+            else
+            {
+                iconImage.gameObject.SetActive(false); // Hide the image container cleanly for normal damage/heals!
+            }
+        }
+
+        // Determine a clean upward speed
         _currentMoveSpeed = new Vector2(
-            Random.Range(0, moveSpeedRangeX.y),
-            Random.Range(0, moveSpeedRangeY.y)
+            0f,
+            Random.Range(moveSpeedRangeY.x, moveSpeedRangeY.y)
         );
 
         _elapsedTime = 0f;
@@ -53,16 +72,20 @@ public class FloatingText : MonoBehaviour
             return;
         }
 
-        // 1. Drift and Gravity
-        //transform.Translate(_currentMoveSpeed * Time.deltaTime);
-        //_currentMoveSpeed.y -= 150f * Time.deltaTime; // Apply slight gravity to curve the arc!
+        // 1. Float straight up
+        transform.Translate(_currentMoveSpeed * Time.deltaTime);
 
         // 2. Animate Scale (pop up quickly, then shrink)
         float currentScale = scaleCurve.Evaluate(normalizedTime);
         transform.localScale = Vector3.one * currentScale;
 
-        // 3. Fade Out
+        // 3. Fade Out (Fading both text and the icon simultaneously)
         float currentAlpha = alphaCurve.Evaluate(normalizedTime);
         textMesh.color = new Color(_baseColor.r, _baseColor.g, _baseColor.b, currentAlpha);
+        
+        if (iconImage != null && iconImage.gameObject.activeSelf)
+        {
+            iconImage.color = new Color(1f, 1f, 1f, currentAlpha);
+        }
     }
 }
