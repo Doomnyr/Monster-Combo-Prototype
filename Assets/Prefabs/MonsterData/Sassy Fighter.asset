@@ -17,12 +17,12 @@ MonoBehaviour:
   race: 1
   element: 1
   baseStats:
-    maxHP: 200
+    maxHP: 500
     maxMana: 100
     strength: 100
-    defense: 1
+    defense: 75
     intelligence: 10
-    speed: 10
+    speed: 75
     critChance: 0.05
     critDamageMult: 1.5
     DodgeChance: 0

@@ -15,12 +15,12 @@ MonoBehaviour:
   monsterName: 6 Tanky Dragon
   monsterSprite: {fileID: 21300000, guid: 93c61a828689c894bbf872e81b3ae78e, type: 3}
   race: 3
-  element: 0
+  element: 4
   baseStats:
-    maxHP: 500
+    maxHP: 700
     maxMana: 100
-    strength: 100
-    defense: 1
+    strength: 75
+    defense: 120
     intelligence: 10
     speed: 10
     critChance: 0.05
