@@ -34,7 +34,6 @@ public class CombatManager : MonoBehaviour
 
     public void PrintMonsterInstances()
     {
-        // 3. Ask the TurnManager for the upcoming turns to print
         List<MonsterInstance> upcomingTurns = _turnManager.GetUpcomingTurns();
         
         foreach (var monster in upcomingTurns)
