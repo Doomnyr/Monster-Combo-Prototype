@@ -8,13 +8,9 @@ public class CombatManager : MonoBehaviour
     public List<MonsterInstance> PlayerTeam { get; private set; } = new List<MonsterInstance>();
     public List<MonsterInstance> EnemyTeam { get; private set; } = new List<MonsterInstance>();
 
-    private Queue<MonsterInstance> _turnQueue = new Queue<MonsterInstance>();
+    private TurnManager _turnManager = new TurnManager();
 
     public event Action OnCombatDataReady;
-    public event Action<int> OnDamageTaken;
-    public event Action<int> OnHealed;
-    public event Action<BuffDefinitionSO, int> OnBuffApplied;
-    public event Action<BuffDefinitionSO> OnBuffRemoved;
 
     public void PrepareMatch(List<MonsterInstance> readyPlayerTeam, List<MonsterInstance> readyEnemyTeam)
     {
@@ -24,7 +20,8 @@ public class CombatManager : MonoBehaviour
         Debug.Log("CombatManager: Teams received. Generating timeline...");
         
         StartMatch();
-        BuildTurnOrder();
+        
+        _turnManager.Initialize(PlayerTeam, EnemyTeam);
 
         PrintMonsterInstances();
         OnCombatDataReady?.Invoke();
@@ -37,7 +34,10 @@ public class CombatManager : MonoBehaviour
 
     public void PrintMonsterInstances()
     {
-        foreach (var monster in _turnQueue)
+        // 3. Ask the TurnManager for the upcoming turns to print
+        List<MonsterInstance> upcomingTurns = _turnManager.GetUpcomingTurns();
+        
+        foreach (var monster in upcomingTurns)
         {
             var baseStats = monster.MonsterDef.BaseStats;
             var buffs = monster.ActiveBuffs;
@@ -91,30 +91,17 @@ public class CombatManager : MonoBehaviour
         }
     }
 
-    private void BuildTurnOrder()
-    {
-        _turnQueue.Clear();
-
-        int maxCount = Mathf.Max(PlayerTeam.Count, EnemyTeam.Count);
-        for (int i = 0; i < maxCount; i++)
-        {
-            if (i < PlayerTeam.Count) _turnQueue.Enqueue(PlayerTeam[i]);
-            if (i < EnemyTeam.Count) _turnQueue.Enqueue(EnemyTeam[i]);
-        }
-        
-        Debug.Log($"Turn queue built with {_turnQueue.Count} monsters. Press SPACE to execute turns.");
-    }
-
     private void ExecuteNextTurn()
     {
-        while (_turnQueue.Count > 0 && _turnQueue.Peek().IsDefeated)
+        // 4. Ask the TurnManager for the next monster
+        MonsterInstance activeMonster = _turnManager.GetNextTurn();
+
+        // If it returns null, everyone is dead!
+        if (activeMonster == null)
         {
-            _turnQueue.Dequeue();
+            Debug.Log("Combat is over! The turn queue is empty.");
+            return;
         }
-
-        if (_turnQueue.Count == 0) return;
-
-        MonsterInstance activeMonster = _turnQueue.Dequeue();
 
         // 1. Gather all living units on the battlefield for target finding
         List<MonsterInstance> battlefield = new List<MonsterInstance>();
@@ -130,7 +117,7 @@ public class CombatManager : MonoBehaviour
         if (activeMonster.MonsterDef.CommandPriorityList.Count == 0)
         {
             Debug.LogWarning($"{activeMonster.MonsterDef.MonsterName} has no skills assigned!");
-            _turnQueue.Enqueue(activeMonster); 
+            _turnManager.RequeueCombatant(activeMonster); // Requeue instead of Enqueue
             return;
         }
         
@@ -148,11 +135,8 @@ public class CombatManager : MonoBehaviour
         // 5. Tick down status durations at the end of the monster's turn
         activeMonster.TickBuffDurations();
 
-        // 6. Put the monster back at the end of the line if they survived
-        if (!activeMonster.IsDefeated)
-        {
-            _turnQueue.Enqueue(activeMonster);
-        }
+        // 6. Tell the TurnManager to put them at the back of the line!
+        _turnManager.RequeueCombatant(activeMonster);
     }
 
     /// <summary>
