@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bc3fa1453d480dd4cb0973dfe4b536fa, type: 3}
+  m_Name: Burn
+  m_EditorClassIdentifier: Assembly-CSharp::BuffDefinitionSO
+  buffName: Burn
+  isDebuff: 1
+  buffIcon: {fileID: 0}
+  maxStacks: 100
+  infiniteStacks: 0
+  statModifiers: []
+  triggeredActions:
+  - triggerTime: 1
+    actionToTrigger:
+      targetFinder: {fileID: 11400000, guid: 74aee106783430b43b381bdbfd2e1037, type: 2}
+      executionEffect: {fileID: 11400000, guid: 331bb656d3974d945ac36318f89339a9, type: 2}

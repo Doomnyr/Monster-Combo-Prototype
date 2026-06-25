@@ -3,7 +3,7 @@ using UnityEngine;
 /// <summary>
 /// The SkillEffect payload that actually puts the status onto a monster.
 /// </summary>
-[CreateAssetMenu(fileName = "Effect_ApplyBuff", menuName = "MonsterCombo/Effects/Apply Status")]
+[CreateAssetMenu(fileName = "Effect_ApplyBuff", menuName = "Effects/Apply Status")]
 public class Effect_ApplyMight : SkillEffectSO
 {
     [Tooltip("The Status Blueprint to apply")]

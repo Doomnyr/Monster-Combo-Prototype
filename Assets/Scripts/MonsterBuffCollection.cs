@@ -9,10 +9,10 @@ public class MonsterBuffCollection
 
     public IReadOnlyList<BuffInstance> ActiveBuffs => activeBuffs.AsReadOnly();
 
+    // The missing events causing your CS1061 compiler error!
     public event Action OnBuffsChanged;
     public event Action<BuffDefinitionSO, int> OnBuffApplied;
     public event Action<BuffDefinitionSO> OnBuffRemoved;
-    
 
     public bool AddBuff(BuffDefinitionSO buffDef, int stacks, int duration)
     {
@@ -28,13 +28,14 @@ public class MonsterBuffCollection
         {
             existingBuff.AddStacks(stacks);
             existingBuff.SetRemainingDuration(duration);
+            OnBuffApplied?.Invoke(buffDef, stacks); // Fire Event!
         }
         else
         {
             activeBuffs.Add(new BuffInstance(buffDef, stacks, duration));
+            OnBuffApplied?.Invoke(buffDef, stacks); // Fire Event!
         }
 
-        OnBuffApplied?.Invoke(buffDef, stacks);
         OnBuffsChanged?.Invoke();
         return true;
     }
@@ -46,7 +47,7 @@ public class MonsterBuffCollection
         bool removed = activeBuffs.RemoveAll(buff => buff.BuffDef == buffDef) > 0;
         if (removed)
         {
-            OnBuffRemoved?.Invoke(buffDef);
+            OnBuffRemoved?.Invoke(buffDef); // Fire Event!
             OnBuffsChanged?.Invoke();
         }
 
@@ -82,13 +83,47 @@ public class MonsterBuffCollection
 
     public bool RemoveExpiredBuffs()
     {
-        return activeBuffs.RemoveAll(buff => buff.IsExpired) > 0;
+        bool anyRemoved = false;
+        for (int i = activeBuffs.Count - 1; i >= 0; i--)
+        {
+            if (activeBuffs[i].IsExpired)
+            {
+                OnBuffRemoved?.Invoke(activeBuffs[i].BuffDef); // Fire Event!
+                activeBuffs.RemoveAt(i);
+                anyRemoved = true;
+            }
+        }
+        return anyRemoved;
     }
 
-    /// <summary>
-    /// Gathers all SkillActions registered under a specific trigger window.
-    /// Multiplies execution runs if a buff stacks (optional, currently runs once per trigger).
-    /// </summary>
+    // --- METHODS FOR STACK MANAGEMENT (Used by Burn Effect) ---
+
+    public int GetBuffStacks(BuffDefinitionSO buffDef)
+    {
+        BuffInstance buff = activeBuffs.Find(b => b.BuffDef == buffDef);
+        return buff != null ? buff.CurrentStacks : 0;
+    }
+
+    public void RemoveBuffStacks(BuffDefinitionSO buffDef, int amount)
+    {
+        BuffInstance buff = activeBuffs.Find(b => b.BuffDef == buffDef);
+        if (buff != null)
+        {
+            buff.RemoveStacks(amount);
+            if (buff.CurrentStacks <= 0)
+            {
+                RemoveBuff(buffDef); // Completely remove the buff if stacks hit 0
+            }
+            else
+            {
+                OnBuffApplied?.Invoke(buffDef, -amount); // Broadcast the stack reduction for UI updates
+                OnBuffsChanged?.Invoke();
+            }
+        }
+    }
+
+    // -----------------------------------------------------------
+
     public List<SkillAction> GetTriggeredActions(BuffTriggerTime triggerTime)
     {
         List<SkillAction> actionsToRun = new List<SkillAction>();
@@ -98,9 +133,6 @@ public class MonsterBuffCollection
             {
                 if (trigger.triggerTime == triggerTime)
                 {
-                    // Run the action once per stack, or just once? 
-                    // For Poison (2% max HP per stack), the effect calculation handles multiplier,
-                    // so we only need to fire the action once.
                     actionsToRun.Add(trigger.actionToTrigger);
                 }
             }

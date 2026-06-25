@@ -27,4 +27,5 @@ MonoBehaviour:
     critDamageMult: 1.5
     DodgeChance: 0
   commandPriorityList:
+  - {fileID: 11400000, guid: c667fa9791e105846b712b65f20b81cb, type: 2}
   - {fileID: 11400000, guid: 56b40c84422297b4ea99abb68f5dcb1f, type: 2}

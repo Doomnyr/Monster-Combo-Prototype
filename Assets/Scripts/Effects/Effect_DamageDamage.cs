@@ -5,7 +5,7 @@ using UnityEngine;
 /// based on any chosen scaling stat (e.g. Strength, Intelligence, Speed)
 /// using our centralized DamageCalculator and elemental relationships.
 /// </summary>
-[CreateAssetMenu(fileName = "Effect_Damage", menuName = "Combat/Effects/Damage")]
+[CreateAssetMenu(fileName = "Effect_Damage", menuName = "Effects/Damage")]
 public class DamageEffect : SkillEffectSO
 {
     [Header("Base Calculations")]

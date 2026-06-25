@@ -86,7 +86,7 @@ public class CombatManager : MonoBehaviour
         if (Keyboard.current != null && Keyboard.current.spaceKey.wasPressedThisFrame)
         {
             ExecuteNextTurn();
-            PrintMonsterInstances();
+            //PrintMonsterInstances();
         }
     }
 

@@ -35,6 +35,12 @@ public class BuffInstance
         }
     }
 
+    public void RemoveStacks(int amount)
+    {
+        CurrentStacks -= amount;
+        if (CurrentStacks < 0) CurrentStacks = 0;
+    }
+
     public void SetRemainingDuration(int duration)
     {
         RemainingDuration = Mathf.Max(0, duration);

@@ -42,4 +42,6 @@ public class CombatConfigSO : ScriptableObject
     public float floatingTextLifetime = 1.2f;
     public float floatingTextUpwardSpeed = 75f;
 
+    [Header("Status Effect Tuning")]
+    public int BURN_DAMAGE = 10;
 }

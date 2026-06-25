@@ -19,11 +19,12 @@ public class MonsterInstance : IHealthObservable, IManaObservable
 
     public event Action<float, float> OnHPChanged;
     public event Action<float, float> OnManaChanged;
+
     public event Action<int> OnDamageTaken;
     public event Action<int> OnHealed;
-    public event Action<BuffDefinitionSO, int> OnBuffApplied;  // (Buff, Stacks Added)
+    public event Action<BuffDefinitionSO, int> OnBuffApplied;
     public event Action<BuffDefinitionSO> OnBuffRemoved;
-    
+
     public MonsterBuffCollection Buffs { get; private set; }
     public IReadOnlyList<BuffInstance> ActiveBuffs => Buffs.ActiveBuffs;
 
@@ -93,22 +94,8 @@ public class MonsterInstance : IHealthObservable, IManaObservable
     public void TakeDamage(int damageAmount)
     {
         CurrentHP -= damageAmount;
-
         OnDamageTaken?.Invoke(damageAmount);
         Debug.Log($"{this.MonsterDef.MonsterName} took {damageAmount} damage! Current HP: {CurrentHP}/{MaxHP}");
-
-        if (CurrentHP <= 0)
-        {
-            Die();
-        }
-    }
-
-    public void TakeHeal(int healAmount)
-    {
-        CurrentHP -= healAmount;
-
-        OnHealed?.Invoke(healAmount);
-        Debug.Log($"{this.MonsterDef.MonsterName} was healed {healAmount}! Current HP: {CurrentHP}/{MaxHP}");
 
         if (CurrentHP <= 0)
         {
@@ -155,9 +142,8 @@ public class MonsterInstance : IHealthObservable, IManaObservable
 
         Buffs = new MonsterBuffCollection();
         Buffs.OnBuffsChanged += RecalculateDerivedStats;
-
-        Buffs.OnBuffApplied += (buffDef, stacks) => OnBuffApplied?.Invoke(buffDef, stacks);
-        Buffs.OnBuffRemoved += (buffDef) => OnBuffRemoved?.Invoke(buffDef);
+        Buffs.OnBuffApplied += (buff, stacks) => OnBuffApplied?.Invoke(buff, stacks);
+        Buffs.OnBuffRemoved += (buff) => OnBuffRemoved?.Invoke(buff);
 
         _currentHP = monsterDef.BaseStats.maxHP;
         _currentMana = monsterDef.BaseStats.maxMana;

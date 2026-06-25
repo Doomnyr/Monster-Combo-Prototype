@@ -10,13 +10,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a157ce9e219e5a8418c99da382804c9e, type: 3}
-  m_Name: Skill_BasicAttack
+  m_Name: Skill_Burning_Assualt
   m_EditorClassIdentifier: Assembly-CSharp::SkillDefinitionSO
-  skillName: Basic Attack
-  description: 
-  manaCost: 0
+  skillName: Burning Assualt
+  description: Deals damage and applies 3 stacks for Burn.
+  manaCost: 20
   _actions:
-  - targetFinder: {fileID: 11400000, guid: 1987b1fcd2d464e418cf9da66e4bcac1, type: 2}
+  - targetFinder: {fileID: 11400000, guid: 2835628dad4cf2a44b5a6321f5f0409b, type: 2}
     executionEffect: {fileID: 11400000, guid: 331bb656d3974d945ac36318f89339a9, type: 2}
-  - targetFinder: {fileID: 11400000, guid: 74aee106783430b43b381bdbfd2e1037, type: 2}
-    executionEffect: {fileID: 11400000, guid: 87263a22e0526d84d95a7827b4fd99c8, type: 2}
+  - targetFinder: {fileID: 11400000, guid: 2835628dad4cf2a44b5a6321f5f0409b, type: 2}
+    executionEffect: {fileID: 11400000, guid: 3fdc5458f20034f44a137663e5593313, type: 2}
