@@ -193,7 +193,7 @@ MonoBehaviour:
     GridPos:
       Column: 0
       Row: 0
-  - MonsterDef: {fileID: 11400000, guid: ff9d11a702afc20419bb2a8244fedac1, type: 2}
+  - MonsterDef: {fileID: 11400000, guid: 7ae2a0f077c739c489904d493085fba9, type: 2}
     GridPos:
       Column: 0
       Row: 1
