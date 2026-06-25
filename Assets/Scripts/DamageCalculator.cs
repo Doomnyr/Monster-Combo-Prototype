@@ -46,7 +46,7 @@ public static class DamageCalculator
     {
         return stat switch
         {
-            StatType.Attack    => caster.Strength,
+            StatType.Strength    => caster.Strength,
             StatType.Defense   => caster.Defense,
             StatType.Speed     => caster.Speed,
             StatType.MaxHP     => caster.MaxHP,
