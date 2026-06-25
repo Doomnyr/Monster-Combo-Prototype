@@ -1,12 +1,24 @@
 using UnityEngine;
 
+/// <summary>
+/// A highly generic, reusable SkillEffect SO that calculates combat damage
+/// based on any chosen scaling stat (e.g. Strength, Intelligence, Speed)
+/// using our centralized DamageCalculator and elemental relationships.
+/// </summary>
 [CreateAssetMenu(fileName = "Effect_Damage", menuName = "Combat/Effects/Damage")]
 public class DamageEffect : SkillEffectSO
 {
-    [Tooltip("Base power of the attack before modifiers.")]
-    [SerializeField] float _damageMultiplier = 1.0f;
+    [Header("Base Calculations")]
+    [Tooltip("Base flat damage value of the skill before statistics or elements are calculated.")]
+    [SerializeField] private int baseDamageValue = 20;
 
-        [Header("Element Settings")]
+    [Tooltip("Select which stat this skill uses to scale its bonus damage.")]
+    [SerializeField] private StatType scalingStat = StatType.Strength;
+
+    [Tooltip("Scale coefficient for the selected stat (e.g., 1.5 adds 150% of the stat to damage).")]
+    [SerializeField] private float statScalingCoefficient = 1.0f;
+
+    [Header("Element Settings")]
     [Tooltip("The element type of the attack. Select 'Default' to make it automatically match the caster's inherent element.")]
     [SerializeField] private MonsterElement attackElement = MonsterElement.Default;
 
@@ -14,24 +26,18 @@ public class DamageEffect : SkillEffectSO
     {
         if (!target.IsAlive) return;
 
-        // 1. Calculate Base Parameter Stats
-        float rawStatDamage = (caster.Strength * _damageMultiplier);
-        
-        // 2. Apply target defense reduction (simple subtraction clamped to a minimum of 1 damage)
-        float reducedDamage = Mathf.Max(1f, rawStatDamage - target.Defense);
-
-        // 3. Evaluate Elemental Relationship using our centralized configuration
-        float elementalMod = CombatConfigSO.Instance.GetElementalMultiplier(
-            attackElement, 
-            target.MonsterDef.Element, 
-            caster.MonsterDef.Element
+        // Route calculation through our centralized Accountant (DamageCalculator)
+        int finalDamage = DamageCalculator.CalculateDamage(
+            caster, 
+            target, 
+            baseDamageValue, 
+            scalingStat,
+            statScalingCoefficient, 
+            attackElement
         );
 
-        // 4. Calculate Final Damage Clamped Value
-        int finalDamage = Mathf.RoundToInt(reducedDamage * elementalMod);
-
-        Debug.Log($"[COMBAT] {caster.MonsterDef.MonsterName} hit {target.MonsterDef.MonsterName} for {finalDamage} damage! " +
-                  $"(Base: {rawStatDamage}, Post-Def: {reducedDamage}, Element Multiplier: {elementalMod}x)");
+        Debug.Log($"[COMBAT] {caster.MonsterDef.MonsterName} ({caster.MonsterDef.Element}) used a " +
+                  $"{attackElement} Skill scaling with {scalingStat} on {target.MonsterDef.MonsterName} ({target.MonsterDef.Element}) for {finalDamage} damage!");
 
         target.TakeDamage(finalDamage);
     }
