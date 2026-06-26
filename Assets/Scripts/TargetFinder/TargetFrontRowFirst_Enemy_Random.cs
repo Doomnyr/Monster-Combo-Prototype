@@ -1,10 +1,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "TargetFrontRowFirst_Enemy_Random", menuName = "TargetFinder/TargetFrontRowFirst_Enemy_Random")]
-public class TargetFrontRowFirst_Enemy_Random : TargetFinderSO
+[CreateAssetMenu(fileName = "Target_FrontRowFirst_Enemy_Random", menuName = "TargetFinder/Target_FrontRowFirst_Enemy_Random")]
+public class Target_FrontRowFirst_Enemy_Random : TargetFinderSO
 {
-    public override List<MonsterInstance> FindTargets(MonsterInstance caster, List<MonsterInstance> battlefield)
+    public override List<MonsterInstance> FindTargets(SkillAction skill, MonsterInstance caster, List<MonsterInstance> battlefield)
     {
         List<MonsterInstance> selectedTargets = new List<MonsterInstance>();
         List<MonsterInstance> validFrontlineEnemies = new List<MonsterInstance>();

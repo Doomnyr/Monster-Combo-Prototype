@@ -9,11 +9,11 @@ public static class ElementalUtility
     /// <summary>
     /// Evaluates the elemental damage modifier and returns an ADDITIVE bonus (+0.5f or -0.5f)
     /// </summary>
-    public static float GetElementalAdditiveBonus(MonsterElement attackElement, MonsterElement targetElement, MonsterElement casterElement)
+    public static float GetElementalAdditiveBonus(ElementType attackElement, ElementType targetElement, ElementType casterElement)
     {
-        MonsterElement finalAttackElement = attackElement == MonsterElement.Default ? casterElement : attackElement;
+        ElementType finalAttackElement = attackElement == ElementType.None ? casterElement : attackElement;
 
-        if (finalAttackElement == MonsterElement.Default || targetElement == MonsterElement.Default)
+        if (finalAttackElement == ElementType.None || targetElement == ElementType.None)
         {
             return 0f; // 0% Bonus
         }
@@ -34,16 +34,16 @@ public static class ElementalUtility
     /// <summary>
     /// Core Elemental Cycle Matrix
     /// </summary>
-    public static bool IsWeakAgainst(MonsterElement target, MonsterElement attacker)
+    public static bool IsWeakAgainst(ElementType target, ElementType attacker)
     {
         switch (target)
         {
-            case MonsterElement.Nature: return attacker == MonsterElement.Fire;
-            case MonsterElement.Earth:  return attacker == MonsterElement.Nature;
-            case MonsterElement.Light:  return attacker == MonsterElement.Earth;
-            case MonsterElement.Dark:   return attacker == MonsterElement.Light;
-            case MonsterElement.Water:  return attacker == MonsterElement.Dark;
-            case MonsterElement.Fire:   return attacker == MonsterElement.Water;
+            case ElementType.Nature: return attacker == ElementType.Fire;
+            case ElementType.Earth:  return attacker == ElementType.Nature;
+            case ElementType.Light:  return attacker == ElementType.Earth;
+            case ElementType.Dark:   return attacker == ElementType.Light;
+            case ElementType.Water:  return attacker == ElementType.Dark;
+            case ElementType.Fire:   return attacker == ElementType.Water;
             default: return false;
         }
     }

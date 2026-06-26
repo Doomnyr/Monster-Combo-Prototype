@@ -86,7 +86,7 @@ public class CombatManager : MonoBehaviour
         if (Keyboard.current != null && Keyboard.current.spaceKey.wasPressedThisFrame)
         {
             ExecuteNextTurn();
-            PrintMonsterInstances();
+            //PrintMonsterInstances();
         }
     }
 
@@ -122,11 +122,8 @@ public class CombatManager : MonoBehaviour
         
         SkillDefinitionSO chosenSkill = activeMonster.MonsterDef.CommandPriorityList[0];
         Debug.Log($"--- [TURN] {activeMonster.MonsterDef.MonsterName} is using {chosenSkill.SkillName}! ---");
+        ExecuteSkill(chosenSkill, activeMonster, battlefield);
 
-        foreach (SkillAction action in chosenSkill.Actions)
-        {
-            ExecuteSkillAction(action, activeMonster, battlefield);
-        }
 
         // 4. TRIGGER: OnTurnEnd Buffs (e.g., Poison ticks damage here!)
         EvaluateBuffTriggers(activeMonster, BuffTriggerTime.OnTurnEnd, battlefield);
@@ -156,21 +153,53 @@ public class CombatManager : MonoBehaviour
     /// <summary>
     /// Highly unified skill execution logic. Reused for both standard Skills AND Buff triggers!
     /// </summary>
+    public void ExecuteSkill(SkillDefinitionSO skill, MonsterInstance caster, List<MonsterInstance> battlefield)
+    {
+        // This holds the targets we want to pass to the NEXT "Previous Selection" action
+        List<MonsterInstance> lastSuccessfulTargets = new List<MonsterInstance>();
+
+        foreach (SkillAction action in skill.Actions)
+        {
+            // 1. Get targets for this action
+            // We pass 'lastSuccessfulTargets' so Target_PreviousSelection can find them
+            List<MonsterInstance> currentActionTargets = action.targetFinder.FindTargets(
+                action, caster, battlefield, lastSuccessfulTargets
+            );
+
+            // 2. Drop the payload on the CURRENT action's targets
+            foreach (MonsterInstance target in currentActionTargets)
+            {
+                if (target != null && target.IsAlive)
+                {
+                    action.executionEffect.Apply(action, caster, target);
+                }
+            }
+
+            // 3. ONLY update lastSuccessfulTargets if this action actually found people
+            // This ensures the "Previous Selection" stays valid for the whole chain
+            if (currentActionTargets.Count > 0)
+            {
+                lastSuccessfulTargets = currentActionTargets;
+            }
+        }
+    }
+
     private void ExecuteSkillAction(SkillAction action, MonsterInstance caster, List<MonsterInstance> battlefield)
     {
-        if (action.targetFinder == null || action.executionEffect == null)
-        {
-            Debug.LogWarning("Skipping Action: Missing finder or effect asset!");
-            return;
-        }
-
-        // A. Ask the Radar (TargetFinder) who to hit
-        List<MonsterInstance> targets = action.targetFinder.FindTargets(caster, battlefield);
-
-        // B. Drop the Payload (SkillEffect) on every target found
+        // A. Resolve Targets
+        // Now using the "Previous Target" logic we discussed
+        List<MonsterInstance> targets = action.targetFinder.FindTargets(action, caster, battlefield);
+        
+    
+        // B. Drop the Payload
         foreach (MonsterInstance target in targets)
         {
-            action.executionEffect.Apply(caster, target);
+            if (target != null && target.IsAlive)
+            {
+                action.executionEffect.Apply(action, caster, target);
+            }
         }
+
+
     }
 }

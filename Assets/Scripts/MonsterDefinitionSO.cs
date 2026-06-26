@@ -9,7 +9,7 @@ public class MonsterDefinitionSO : ScriptableObject
     [SerializeField] private string monsterName;
     [SerializeField] private Sprite monsterSprite;
     [SerializeField] private MonsterRace race;
-    [SerializeField] private MonsterElement element;
+    [SerializeField] private ElementType element;
 
     [Header("Base Attribute Settings")]
     [SerializeField] private StatBlock baseStats;
@@ -21,7 +21,7 @@ public class MonsterDefinitionSO : ScriptableObject
     public string MonsterName => monsterName;
     public Sprite MonsterSprite => monsterSprite;
     public MonsterRace Race => race;
-    public MonsterElement Element => element;
+    public ElementType Element => element;
     public StatBlock BaseStats => baseStats;
     public List<SkillDefinitionSO> CommandPriorityList => commandPriorityList;
 }

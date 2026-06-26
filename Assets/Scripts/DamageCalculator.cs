@@ -9,7 +9,7 @@ public static class DamageCalculator
     /// <summary>
     /// Calculates the final damage value between a caster and a target using our unified damage pipeline.
     /// </summary>
-    public static int CalculateDamage(MonsterInstance caster, MonsterInstance target, int baseDamageValue, StatType scalingStat, float scalingCoefficient, MonsterElement attackElement)
+    public static int CalculateDamage(MonsterInstance caster, MonsterInstance target, int baseDamageValue, StatType scalingStat, float scalingCoefficient, ElementType attackElement)
     {
         // 1. DYNAMIC STAT FETCHING: Get the value for the specific StatType
         float statValue = GetStatValue(caster, scalingStat);
