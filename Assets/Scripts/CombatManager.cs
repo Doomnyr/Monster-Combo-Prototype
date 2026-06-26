@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using UnityEditor.Rendering.LookDev;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -149,28 +150,30 @@ public class CombatManager : MonoBehaviour
         Debug.Log($"[BUFF TRIGGER] Evaluating {triggerTime} triggers for {monster.MonsterDef.MonsterName}...");
         foreach (SkillAction action in triggeredActions)
         {
-            ExecuteSkillAction(action, monster, battlefield);
+            ExecuteSkillAction(Context, action);
         }
     }
 
-    /// <summary>
-    /// Highly unified skill execution logic. Reused for both standard Skills AND Buff triggers!
-    /// </summary>
-    private void ExecuteSkillAction(SkillAction action, MonsterInstance caster, List<MonsterInstance> battlefield)
+    private void ExecuteSkillAction(SkillDefinitionSO skill, MonsterInstance caster, List<MonsterInstance> battlefield)
     {
-        if (action.targetFinder == null || action.executionEffect == null)
-        {
-            Debug.LogWarning("Skipping Action: Missing finder or effect asset!");
-            return;
-        }
+        // 1. Create the context for this skill execution
+        var context = new SkillExecutionContext(caster);
 
-        // A. Ask the Radar (TargetFinder) who to hit
-        List<MonsterInstance> targets = action.targetFinder.FindTargets(caster, battlefield);
-
-        // B. Drop the Payload (SkillEffect) on every target found
-        foreach (MonsterInstance target in targets)
+        // 2. Iterate through the actions defined in the SkillDefinitionSO
+        foreach (SkillAction action in skill.Actions) // skill.Actions is the List<SkillAction>
         {
-            action.executionEffect.Apply(caster, target);
+            // 3. Resolve targets using the context (this uses your new TargetFinder logic)
+            List<MonsterInstance> targets = action.targetFinder.FindTargets(context, battlefield);
+
+            // 4. Update memory for the next action in the chain
+            context.LastTargets = targets;
+
+            // 5. Apply effect to each target
+            foreach (var target in targets)
+            {
+                // Now you pass the 'context' and the 'action' (the tuning parameters)
+                action.executionEffect.Apply(context, action); 
+            }
         }
     }
 }

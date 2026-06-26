@@ -9,5 +9,5 @@ public abstract class SkillEffectSO : ScriptableObject
     /// </summary>
     /// <param name="caster">The runtime instance of the monster casting the skill.</param>
     /// <param name="target">The individual runtime instance receiving this effect.</param>
-    public abstract void Apply(MonsterInstance caster, MonsterInstance target);
+    public abstract void Apply(SkillExecutionContext context, SkillAction skill);
 }

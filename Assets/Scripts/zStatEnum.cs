@@ -3,7 +3,7 @@ using System;
 // 1. What stats can a status modify?
 public enum StatType
 {
-MaxHP,
+    MaxHP,
     MaxMana,
     Strength,
     Defense,

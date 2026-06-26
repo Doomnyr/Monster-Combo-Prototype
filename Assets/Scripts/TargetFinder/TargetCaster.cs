@@ -4,10 +4,10 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "TargetCaster", menuName = "TargetFinder/TargetCaster")]
 public class TargetCaster : TargetFinderSO
 {
-    public override List<MonsterInstance> FindTargets(MonsterInstance caster, List<MonsterInstance> battlefield)
+    public override List<MonsterInstance> FindTargets(SkillExecutionContext context, List<MonsterInstance> battlefield)
     {
         List<MonsterInstance> selectedTargets = new List<MonsterInstance>();
-        selectedTargets.Add(caster);
+        selectedTargets.Add(context.Caster);
 
         return selectedTargets;
     }

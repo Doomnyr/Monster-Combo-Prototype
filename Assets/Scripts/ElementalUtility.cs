@@ -11,12 +11,7 @@ public static class ElementalUtility
     /// </summary>
     public static float GetElementalAdditiveBonus(MonsterElement attackElement, MonsterElement targetElement, MonsterElement casterElement)
     {
-        MonsterElement finalAttackElement = attackElement == MonsterElement.Default ? casterElement : attackElement;
-
-        if (finalAttackElement == MonsterElement.Default || targetElement == MonsterElement.Default)
-        {
-            return 0f; // 0% Bonus
-        }
+        MonsterElement finalAttackElement = attackElement;
 
         if (IsWeakAgainst(targetElement, finalAttackElement))
         {

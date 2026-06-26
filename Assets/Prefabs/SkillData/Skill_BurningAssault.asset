@@ -10,27 +10,27 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a157ce9e219e5a8418c99da382804c9e, type: 3}
-  m_Name: Skill_MightyPunch
+  m_Name: Skill_BurningAssault
   m_EditorClassIdentifier: Assembly-CSharp::SkillDefinitionSO
-  _name: 
+  _name: Burning Assault
   _description: 
-  _manaCost: 0
+  _manaCost: 20
   _actions:
   - targetFinder: {fileID: 11400000, guid: 1987b1fcd2d464e418cf9da66e4bcac1, type: 2}
     executionEffect: {fileID: 11400000, guid: 331bb656d3974d945ac36318f89339a9, type: 2}
     _skillElement: 1
-    baseValue: 50
+    baseValue: 100
     scaleCoefficient: 1
     scaleStat: 2
     buffToApply: {fileID: 0}
     buffDuration: 0
     buffCount: 0
-  - targetFinder: {fileID: 11400000, guid: 74aee106783430b43b381bdbfd2e1037, type: 2}
-    executionEffect: {fileID: 11400000, guid: ccfcc399a267a5e4ca1d97bfc55bad68, type: 2}
+  - targetFinder: {fileID: 11400000, guid: 1987b1fcd2d464e418cf9da66e4bcac1, type: 2}
+    executionEffect: {fileID: 0}
     _skillElement: 1
     baseValue: 0
     scaleCoefficient: 0
     scaleStat: 0
-    buffToApply: {fileID: 11400000, guid: d239151449594104fabdb805b8e9c792, type: 2}
-    buffDuration: 3
-    buffCount: 3
+    buffToApply: {fileID: 0}
+    buffDuration: 0
+    buffCount: 0

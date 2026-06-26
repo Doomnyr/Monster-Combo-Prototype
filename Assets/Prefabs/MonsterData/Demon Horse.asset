@@ -15,7 +15,7 @@ MonoBehaviour:
   monsterName: Demon Horse
   monsterSprite: {fileID: 21300000, guid: c10edc547980b934c8c2a32e8cac7eb6, type: 3}
   race: 0
-  element: 2
+  element: 1
   baseStats:
     maxHP: 400
     maxMana: 100
@@ -27,4 +27,5 @@ MonoBehaviour:
     critDamageMult: 1.5
     DodgeChance: 0
   commandPriorityList:
+  - {fileID: 11400000, guid: 24d1858fe6bd8844dbcf51d008b8fffd, type: 2}
   - {fileID: 11400000, guid: 56b40c84422297b4ea99abb68f5dcb1f, type: 2}
