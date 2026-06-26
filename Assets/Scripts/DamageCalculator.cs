@@ -13,14 +13,7 @@ public static class DamageCalculator
         
         return damagePipeline.CalculateFinalDamage();
     }
-
-    public static int CalculateFlatDamageMultipledByStacks(MonsterInstance caster, MonsterInstance target, int baseDamageValue)
-    {
-        DamageContext damagePipeline = new DamageContext(baseDamageValue);
-        
-        return damagePipeline.CalculateFinalDamage();
-    }
-
+    
     /// <summary>
     /// Calculates the final damage value between a caster and a target using our unified damage pipeline.
     /// </summary>

@@ -14,6 +14,9 @@ public class MonsterDefinitionSO : ScriptableObject
     [Header("Base Attribute Settings")]
     [SerializeField] private StatBlock baseStats;
 
+    [Header("Traits")]
+    public List<TraitDefinitionSO> traits;
+
     [Header("AI Command Priority List")]
     [Tooltip("The engine reads this from top to bottom. It will execute the first skill it can afford and/or is valid.")]
     [SerializeField] private List<SkillDefinitionSO> commandPriorityList = new List<SkillDefinitionSO>();
@@ -24,4 +27,5 @@ public class MonsterDefinitionSO : ScriptableObject
     public ElementType Element => element;
     public StatBlock BaseStats => baseStats;
     public List<SkillDefinitionSO> CommandPriorityList => commandPriorityList;
+    public List<TraitDefinitionSO> Traits => traits;
 }

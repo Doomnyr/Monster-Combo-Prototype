@@ -21,7 +21,9 @@ public class CombatManager : MonoBehaviour
         
         StartMatch();
         
+        TriggerOnCombatStartEffects();
         _turnManager.Initialize(PlayerTeam, EnemyTeam);
+        
 
         PrintMonsterInstances();
         OnCombatDataReady?.Invoke();
@@ -90,6 +92,44 @@ public class CombatManager : MonoBehaviour
         }
     }
 
+    private void TriggerOnCombatStartEffects()
+    {
+        List<MonsterInstance> allMonsters = new List<MonsterInstance>();
+        allMonsters.AddRange(PlayerTeam);
+        allMonsters.AddRange(EnemyTeam);
+
+        Debug.Log("Triger Start of combat effects.");
+        foreach (var monster in allMonsters)
+        {
+            ProcessTriggers(monster, CombatTriggerTime.OnCombatStart);
+        }
+    }
+
+    private void ProcessTriggers(MonsterInstance monster, CombatTriggerTime triggerTime)
+    {
+        Debug.Log($"[CombatManager] Processing {triggerTime} for {monster.MonsterDef.MonsterName}");
+        List<MonsterInstance> battlefield = new List<MonsterInstance>();
+        battlefield.AddRange(PlayerTeam);
+        battlefield.AddRange(EnemyTeam);
+        
+        // 2. Process Buff Triggers
+        var buffActions = monster.Buffs.GetTriggeredActions(triggerTime);
+        foreach (var action in buffActions) 
+        {
+            Debug.Log("Found buff to trigger!");
+            ExecuteSkillAction(action, monster, battlefield);
+        }
+
+        // 3. Process Trait Triggers
+        // (You will add this method to MonsterInstance shortly)
+        var traitActions = monster.GetTriggeredTraitActions(triggerTime);
+        foreach (var action in traitActions) 
+        {
+            Debug.Log("Found trait to trigger!");
+            ExecuteSkillAction(action, monster, battlefield);
+        }
+    }
+
     private void ExecuteNextTurn()
     {
         // 4. Ask the TurnManager for the next monster
@@ -108,7 +148,7 @@ public class CombatManager : MonoBehaviour
         battlefield.AddRange(EnemyTeam);
 
         // 2. TRIGGER: OnTurnStart Buffs (e.g., Regen heals here!)
-        EvaluateBuffTriggers(activeMonster, BuffTriggerTime.OnTurnStart, battlefield);
+        EvaluateBuffTriggers(activeMonster, CombatTriggerTime.OnTurnStart, battlefield);
 
         if (activeMonster.IsDefeated) return; // Guard in case turn-start debuffs fainted them
 
@@ -126,7 +166,7 @@ public class CombatManager : MonoBehaviour
 
 
         // 4. TRIGGER: OnTurnEnd Buffs (e.g., Poison ticks damage here!)
-        EvaluateBuffTriggers(activeMonster, BuffTriggerTime.OnTurnEnd, battlefield);
+        EvaluateBuffTriggers(activeMonster, CombatTriggerTime.OnTurnEnd, battlefield);
 
         // 5. Tick down status durations at the end of the monster's turn
         activeMonster.TickBuffDurations();
@@ -135,10 +175,21 @@ public class CombatManager : MonoBehaviour
         _turnManager.RequeueCombatant(activeMonster);
     }
 
+    private void EvaluateAllTriggers(MonsterInstance monster, CombatTriggerTime triggerTime, List<MonsterInstance> battlefield)
+    {
+        // 1. Get Triggered Buff Actions (Existing)
+        var buffActions = monster.GetTriggeredBuffActions(triggerTime);
+        foreach (var action in buffActions) ExecuteSkillAction(action, monster, battlefield);
+
+        // 2. Get Triggered Trait Actions (NEW)
+        var traitActions = monster.GetTriggeredTraitActions(triggerTime);
+        foreach (var action in traitActions) ExecuteSkillAction(action, monster, battlefield);
+    }
+
     /// <summary>
     /// Evaluates and runs active actions registered directly on the active unit's active buffs.
     /// </summary>
-    private void EvaluateBuffTriggers(MonsterInstance monster, BuffTriggerTime triggerTime, List<MonsterInstance> battlefield)
+    private void EvaluateBuffTriggers(MonsterInstance monster, CombatTriggerTime triggerTime, List<MonsterInstance> battlefield)
     {
         List<SkillAction> triggeredActions = monster.GetTriggeredBuffActions(triggerTime);
         if (triggeredActions.Count == 0) return;

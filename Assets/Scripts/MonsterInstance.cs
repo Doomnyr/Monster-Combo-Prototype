@@ -26,6 +26,7 @@ public class MonsterInstance : IHealthObservable, IManaObservable
     
     public MonsterBuffCollection Buffs { get; private set; }
     public IReadOnlyList<BuffInstance> ActiveBuffs => Buffs.ActiveBuffs;
+    public List<TraitDefinitionSO> Traits { get; private set; }
 
     private float _cachedMaxHP;
     private float _cachedMaxMana;
@@ -141,12 +142,28 @@ public class MonsterInstance : IHealthObservable, IManaObservable
         Buffs.TickDurations();
     }
 
-    public List<SkillAction> GetTriggeredBuffActions(BuffTriggerTime triggerTime)
+    public List<SkillAction> GetTriggeredBuffActions(CombatTriggerTime triggerTime)
     {
         return Buffs.GetTriggeredActions(triggerTime);
     }
 
-    public MonsterInstance(MonsterDefinitionSO monsterDef, CombatTeam team, GridPosition startingPosition)
+    public List<SkillAction> GetTriggeredTraitActions(CombatTriggerTime triggerTime)
+    {
+        List<SkillAction> actions = new List<SkillAction>();
+        foreach (var trait in Traits)
+        {
+            foreach (var trigger in trait.triggeredActions) // Assuming TraitDefinitionSO has this list
+            {
+                if (trigger.triggerTime == triggerTime)
+                {
+                    actions.Add(trigger.actionToTrigger);
+                }
+            }
+        }
+        return actions;
+    }
+
+    public MonsterInstance(MonsterDefinitionSO monsterDef, CombatTeam team, GridPosition startingPosition, List<TraitDefinitionSO> traits)
     {
         MonsterDef = monsterDef ?? throw new ArgumentNullException(nameof(monsterDef));
         InstanceId = Guid.NewGuid().ToString();
@@ -158,6 +175,8 @@ public class MonsterInstance : IHealthObservable, IManaObservable
 
         Buffs.OnBuffApplied += (buffDef, stacks) => OnBuffApplied?.Invoke(buffDef, stacks);
         Buffs.OnBuffRemoved += (buffDef) => OnBuffRemoved?.Invoke(buffDef);
+
+        Traits = traits ?? new List<TraitDefinitionSO>();
 
         _currentHP = monsterDef.BaseStats.maxHP;
         _currentMana = monsterDef.BaseStats.maxMana;

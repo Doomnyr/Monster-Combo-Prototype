@@ -71,4 +71,9 @@ public class TurnManager
     {
         return _turnQueue.Where(m => m.IsAlive).ToList();
     }
+
+    public Queue<MonsterInstance> GetMonsterList()
+    {
+        return _turnQueue;
+    }
 }

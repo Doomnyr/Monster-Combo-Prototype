@@ -8,8 +8,6 @@ public struct TeamSlotConfiguration
     public GridPosition GridPos; // Column (0-1), Row (0-2)
 }
 
-
-
 public class CombatLoader : MonoBehaviour
 {
 
@@ -41,7 +39,7 @@ public class CombatLoader : MonoBehaviour
         {
             if (slot.MonsterDef == null) continue;
 
-            MonsterInstance instance = new MonsterInstance(slot.MonsterDef, team, slot.GridPos);
+            MonsterInstance instance = new MonsterInstance(slot.MonsterDef, team, slot.GridPos, slot.MonsterDef.traits);
             instantiatedTeam.Add(instance);
         }
 
