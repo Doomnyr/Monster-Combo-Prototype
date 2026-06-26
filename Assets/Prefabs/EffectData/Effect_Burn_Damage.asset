@@ -9,6 +9,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3ae777cd23de9ce4889e0caebf6b5484, type: 3}
-  m_Name: Effect_Damage
-  m_EditorClassIdentifier: Assembly-CSharp::Effect_Damage
+  m_Script: {fileID: 11500000, guid: 210daaa7c80331c41b25b1d978a0e89f, type: 3}
+  m_Name: Effect_Burn_Damage
+  m_EditorClassIdentifier: Assembly-CSharp::DamageEffect
+  _damageMultiplier: 1

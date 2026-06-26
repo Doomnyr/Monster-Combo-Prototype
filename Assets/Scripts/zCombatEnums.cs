@@ -16,3 +16,12 @@ public struct GridPosition
         Row = row;
     }
 }
+
+public enum BuffType
+{
+    None,
+    Burn,
+    Poison,
+    Bleed,
+    Chill
+}

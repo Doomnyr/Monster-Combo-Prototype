@@ -15,7 +15,19 @@ MonoBehaviour:
   buffName: Burn
   isDebuff: 1
   buffIcon: {fileID: 21300000, guid: 4ac3091fed4b06d439789e4159e4220e, type: 3}
+  buffType: 1
   maxStacks: 100
   infiniteStacks: 0
   statModifiers: []
-  triggeredActions: []
+  triggeredActions:
+  - triggerTime: 1
+    actionToTrigger:
+      targetFinder: {fileID: 11400000, guid: 74aee106783430b43b381bdbfd2e1037, type: 2}
+      executionEffect: {fileID: 11400000, guid: 30c38d1906bb3594693a1edb0f2d7e92, type: 2}
+      element: 6
+      baseValue: 8
+      scalingStat: 0
+      scalingCoefficient: 0
+      buffToApply: {fileID: 0}
+      buffCount: 0
+      buffduration: 0

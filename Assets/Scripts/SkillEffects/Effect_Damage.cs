@@ -1,7 +1,7 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "Effect_Damage", menuName = "Combat/Effects/Damage")]
-public class DamageEffect : SkillEffectSO
+[CreateAssetMenu(fileName = "Effect_Damage", menuName = "Combat/Effects/Effect_Damage")]
+public class Effect_Damage : SkillEffectSO
 {
     public override void Apply(SkillAction skill, MonsterInstance caster, MonsterInstance target)
     {

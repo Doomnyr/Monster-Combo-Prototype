@@ -9,7 +9,8 @@ public class BuffDefinitionSO : ScriptableObject
     public string buffName;
     public bool isDebuff; 
     public Sprite buffIcon;
-    
+    public BuffType buffType;
+
     [Header("Stacking Rules")]
     public int maxStacks = 1;
     public bool infiniteStacks = false;

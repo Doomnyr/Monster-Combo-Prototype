@@ -12,11 +12,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a157ce9e219e5a8418c99da382804c9e, type: 3}
   m_Name: Skill_BasicAttack
   m_EditorClassIdentifier: Assembly-CSharp::SkillDefinitionSO
-  skillName: Basic Attack
-  description: 
-  manaCost: 0
+  _name: 
+  _description: 
+  _element: 0
+  _manaCost: 0
   _actions:
   - targetFinder: {fileID: 11400000, guid: 1987b1fcd2d464e418cf9da66e4bcac1, type: 2}
     executionEffect: {fileID: 11400000, guid: 331bb656d3974d945ac36318f89339a9, type: 2}
+    element: 6
+    baseValue: 100
+    scalingStat: 2
+    scalingCoefficient: 1
+    buffToApply: {fileID: 0}
+    buffCount: 1
+    buffduration: 3
   - targetFinder: {fileID: 11400000, guid: 1987b1fcd2d464e418cf9da66e4bcac1, type: 2}
     executionEffect: {fileID: 11400000, guid: 87263a22e0526d84d95a7827b4fd99c8, type: 2}
+    element: 6
+    baseValue: 0
+    scalingStat: 0
+    scalingCoefficient: 0
+    buffToApply: {fileID: 0}
+    buffCount: 1
+    buffduration: 3

@@ -42,4 +42,5 @@ public class CombatConfigSO : ScriptableObject
     public float floatingTextLifetime = 1.2f;
     public float floatingTextUpwardSpeed = 75f;
 
+    public static float BURN_DAMAGE = 8;
 }
