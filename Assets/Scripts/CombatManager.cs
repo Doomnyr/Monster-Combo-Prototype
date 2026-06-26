@@ -86,7 +86,7 @@ public class CombatManager : MonoBehaviour
         if (Keyboard.current != null && Keyboard.current.spaceKey.wasPressedThisFrame)
         {
             ExecuteNextTurn();
-            PrintMonsterInstances();
+            //PrintMonsterInstances();
         }
     }
 
@@ -122,11 +122,8 @@ public class CombatManager : MonoBehaviour
         
         SkillDefinitionSO chosenSkill = activeMonster.MonsterDef.CommandPriorityList[0];
         Debug.Log($"--- [TURN] {activeMonster.MonsterDef.MonsterName} is using {chosenSkill.SkillName}! ---");
+        ExecuteSkill(chosenSkill, activeMonster, battlefield);
 
-        foreach (SkillAction action in chosenSkill.Actions)
-        {
-            ExecuteSkillAction(action, activeMonster, battlefield);
-        }
 
         // 4. TRIGGER: OnTurnEnd Buffs (e.g., Poison ticks damage here!)
         EvaluateBuffTriggers(activeMonster, BuffTriggerTime.OnTurnEnd, battlefield);
@@ -156,21 +153,34 @@ public class CombatManager : MonoBehaviour
     /// <summary>
     /// Highly unified skill execution logic. Reused for both standard Skills AND Buff triggers!
     /// </summary>
+    public void ExecuteSkill(SkillDefinitionSO skill, MonsterInstance caster, List<MonsterInstance> battlefield)
+    {
+        // 1. Validate the skill
+        if (skill == null || skill.Actions == null || skill.Actions.Count == 0) return;
+
+        // 2. Loop through every Action defined in the SkillDefinitionSO
+        foreach (SkillAction action in skill.Actions)
+        {
+            ExecuteSkillAction(action, caster, battlefield);
+        }
+    }
+
     private void ExecuteSkillAction(SkillAction action, MonsterInstance caster, List<MonsterInstance> battlefield)
     {
-        if (action.targetFinder == null || action.executionEffect == null)
-        {
-            Debug.LogWarning("Skipping Action: Missing finder or effect asset!");
-            return;
-        }
+        // A. Resolve Targets
+        // Now using the "Previous Target" logic we discussed
+        List<MonsterInstance> targets = action.targetFinder.FindTargets(action, caster, battlefield);
+        
+        // Store these so the NEXT action in the loop can access them via TargetFinder_Previous
+        action.previousTargets = targets;
 
-        // A. Ask the Radar (TargetFinder) who to hit
-        List<MonsterInstance> targets = action.targetFinder.FindTargets(caster, battlefield);
-
-        // B. Drop the Payload (SkillEffect) on every target found
+        // B. Drop the Payload
         foreach (MonsterInstance target in targets)
         {
-            action.executionEffect.Apply(caster, target);
+            if (target != null && target.IsAlive)
+            {
+                action.executionEffect.Apply(action, caster, target);
+            }
         }
     }
 }

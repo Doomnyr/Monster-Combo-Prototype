@@ -5,11 +5,13 @@ using System.Collections.Generic;
 public class SkillDefinitionSO : ScriptableObject
 {
     [Header("Identity Elements")]
-    [SerializeField] private string skillName;
-    [SerializeField] [TextArea(2, 4)] private string description;
+    [SerializeField] private string _name;
+    [SerializeField] [TextArea(2, 4)] private string _description;
+    [SerializeField] private ElementType _element;
 
     [Header("Requirements")]
-    [SerializeField] private float manaCost;
+    [SerializeField] private float _manaCost;
+
 
     [Header("Skill Sequence")]
     [Tooltip("The steps this skill takes when executed, in order.")]
@@ -17,10 +19,10 @@ public class SkillDefinitionSO : ScriptableObject
     private List<SkillAction> _actions = new List<SkillAction>();
 
     // Clean public contracts
-    public string SkillName => skillName;
-    public string Description => description;
-    public float ManaCost => manaCost;
+    public string SkillName => _name;
+    public string Description => _description;
+    public float ManaCost => _manaCost;
+    public ElementType Element => _element;
     
-    // This exposes your new paired actions to the Combat Manager
     public List<SkillAction> Actions => _actions; 
 }

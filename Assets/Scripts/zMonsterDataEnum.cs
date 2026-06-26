@@ -14,14 +14,14 @@ public struct StatBlock {
 
 // Traits
 
-public enum MonsterElement {
-    Default,
+public enum ElementType {
     Water,
     Fire,
     Nature,
     Earth,
     Light,
-    Dark
+    Dark,
+    None
 }
 
 public enum MonsterRace {
