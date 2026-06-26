@@ -155,21 +155,31 @@ public class CombatManager : MonoBehaviour
     /// </summary>
     public void ExecuteSkill(SkillDefinitionSO skill, MonsterInstance caster, List<MonsterInstance> battlefield)
     {
-        // 1. Validate the skill
-        if (skill == null || skill.Actions == null || skill.Actions.Count == 0) return;
+        // This holds the targets we want to pass to the NEXT "Previous Selection" action
+        List<MonsterInstance> lastSuccessfulTargets = new List<MonsterInstance>();
 
         foreach (SkillAction action in skill.Actions)
         {
-            List<MonsterInstance> sessionTargets = new List<MonsterInstance>();
-            sessionTargets = action.targetFinder.FindTargets(action, caster, battlefield, sessionTargets);
-            
-            // 2. Drop the Payload
-            foreach (MonsterInstance target in sessionTargets)
+            // 1. Get targets for this action
+            // We pass 'lastSuccessfulTargets' so Target_PreviousSelection can find them
+            List<MonsterInstance> currentActionTargets = action.targetFinder.FindTargets(
+                action, caster, battlefield, lastSuccessfulTargets
+            );
+
+            // 2. Drop the payload on the CURRENT action's targets
+            foreach (MonsterInstance target in currentActionTargets)
             {
                 if (target != null && target.IsAlive)
                 {
                     action.executionEffect.Apply(action, caster, target);
                 }
+            }
+
+            // 3. ONLY update lastSuccessfulTargets if this action actually found people
+            // This ensures the "Previous Selection" stays valid for the whole chain
+            if (currentActionTargets.Count > 0)
+            {
+                lastSuccessfulTargets = currentActionTargets;
             }
         }
     }
