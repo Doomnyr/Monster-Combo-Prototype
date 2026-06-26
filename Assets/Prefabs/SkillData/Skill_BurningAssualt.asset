@@ -19,7 +19,6 @@ MonoBehaviour:
   _actions:
   - targetFinder: {fileID: 11400000, guid: 1987b1fcd2d464e418cf9da66e4bcac1, type: 2}
     executionEffect: {fileID: 11400000, guid: 331bb656d3974d945ac36318f89339a9, type: 2}
-    previousTargets: []
     element: 6
     baseValue: 50
     scalingStat: 2
@@ -29,11 +28,19 @@ MonoBehaviour:
     buffduration: 0
   - targetFinder: {fileID: 11400000, guid: 9f480d4a4c795274783f5d3e58f025ac, type: 2}
     executionEffect: {fileID: 11400000, guid: 78b5c7205afd8174c8b69330ed6e87ce, type: 2}
-    previousTargets: []
     element: 6
     baseValue: 0
     scalingStat: 0
     scalingCoefficient: 0
     buffToApply: {fileID: 11400000, guid: d239151449594104fabdb805b8e9c792, type: 2}
+    buffCount: 10
+    buffduration: 10
+  - targetFinder: {fileID: 11400000, guid: 74aee106783430b43b381bdbfd2e1037, type: 2}
+    executionEffect: {fileID: 11400000, guid: 78b5c7205afd8174c8b69330ed6e87ce, type: 2}
+    element: 6
+    baseValue: 0
+    scalingStat: 0
+    scalingCoefficient: 0
+    buffToApply: {fileID: 11400000, guid: a05469183de916248be62010c8a3d698, type: 2}
     buffCount: 10
     buffduration: 10

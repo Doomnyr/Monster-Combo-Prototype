@@ -20,6 +20,4 @@ public class SkillAction
     public int buffCount = 1;
     public int buffduration = 3;
 
-    [System.NonSerialized] 
-    public List<MonsterInstance> previousTargets = new List<MonsterInstance>();
 }

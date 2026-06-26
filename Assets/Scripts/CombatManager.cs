@@ -158,10 +158,19 @@ public class CombatManager : MonoBehaviour
         // 1. Validate the skill
         if (skill == null || skill.Actions == null || skill.Actions.Count == 0) return;
 
-        // 2. Loop through every Action defined in the SkillDefinitionSO
         foreach (SkillAction action in skill.Actions)
         {
-            ExecuteSkillAction(action, caster, battlefield);
+            List<MonsterInstance> sessionTargets = new List<MonsterInstance>();
+            sessionTargets = action.targetFinder.FindTargets(action, caster, battlefield, sessionTargets);
+            
+            // 2. Drop the Payload
+            foreach (MonsterInstance target in sessionTargets)
+            {
+                if (target != null && target.IsAlive)
+                {
+                    action.executionEffect.Apply(action, caster, target);
+                }
+            }
         }
     }
 
@@ -171,9 +180,7 @@ public class CombatManager : MonoBehaviour
         // Now using the "Previous Target" logic we discussed
         List<MonsterInstance> targets = action.targetFinder.FindTargets(action, caster, battlefield);
         
-        // Store these so the NEXT action in the loop can access them via TargetFinder_Previous
-        action.previousTargets = targets;
-
+    
         // B. Drop the Payload
         foreach (MonsterInstance target in targets)
         {
@@ -182,5 +189,7 @@ public class CombatManager : MonoBehaviour
                 action.executionEffect.Apply(action, caster, target);
             }
         }
+
+
     }
 }

@@ -4,15 +4,23 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "Target_PreviousSelection", menuName = "TargetFinder/Target_PreviousSelection")]
 public class Target_PreviousSelection : TargetFinderSO
 {
+    // 1. You MUST implement this because it is 'abstract' in the base class
     public override List<MonsterInstance> FindTargets(SkillAction action, MonsterInstance caster, List<MonsterInstance> battlefield)
     {
-        // Simply return the list we saved in the previous step
-        if (action.previousTargets != null && action.previousTargets.Count > 0)
-        {
-            return action.previousTargets;
-        }
+        // If someone calls the old version, just pass an empty list 
+        // (or handle it however you prefer if no previous targets exist)
+        return FindTargets(action, caster, battlefield, new List<MonsterInstance>());
+    }
 
-        Debug.LogWarning("TargetFinder_Previous: No previous targets found! Returning empty list.");
+    // 2. This is your new logic
+    public override List<MonsterInstance> FindTargets(SkillAction action, MonsterInstance caster, List<MonsterInstance> battlefield, List<MonsterInstance> sessionTargets)
+    {
+        if (sessionTargets != null && sessionTargets.Count > 0)
+        {
+            return sessionTargets;
+        }
+        
+        Debug.LogWarning("Target_PreviousSelection: No session targets found!");
         return new List<MonsterInstance>();
     }
 }
