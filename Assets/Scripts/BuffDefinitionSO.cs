@@ -37,7 +37,7 @@ public struct StatModifierData
 [Serializable]
 public struct BuffTriggerData
 {
-    public BuffTriggerTime triggerTime;
+    public CombatTriggerTime triggerTime;
     
     [Tooltip("Reusing our SkillAction! E.g., TargetSelf + Effect_Damage")]
     public SkillAction actionToTrigger; 

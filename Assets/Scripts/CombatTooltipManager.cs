@@ -65,6 +65,7 @@ public class CombatTooltipManager : MonoBehaviour
         statsSb.AppendLine($"HP: {monster.CurrentHP} / {baseStats.maxHP}");
         statsSb.AppendLine($"Mana: {monster.CurrentMana} / {baseStats.maxMana}");
         statsSb.AppendLine($"ATK: {monster.Strength} <size=80%>(Base: {baseStats.strength})</size>");
+        statsSb.AppendLine($"INT: {monster.Intelligence} <size=80%>(Base: {baseStats.intelligence})</size>");
         statsSb.AppendLine($"DEF: {monster.Defense} <size=80%>(Base: {baseStats.defense})</size>");
         statsSb.AppendLine($"SPD: {baseStats.speed}");
         statsText.text = statsSb.ToString();

@@ -89,7 +89,7 @@ public class MonsterBuffCollection
     /// Gathers all SkillActions registered under a specific trigger window.
     /// Multiplies execution runs if a buff stacks (optional, currently runs once per trigger).
     /// </summary>
-    public List<SkillAction> GetTriggeredActions(BuffTriggerTime triggerTime)
+    public List<SkillAction> GetTriggeredActions(CombatTriggerTime triggerTime)
     {
         List<SkillAction> actionsToRun = new List<SkillAction>();
         foreach (var buff in activeBuffs)
