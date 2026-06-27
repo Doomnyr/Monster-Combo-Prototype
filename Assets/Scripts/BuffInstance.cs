@@ -4,17 +4,19 @@ public class BuffInstance
 {
     public BuffDefinitionSO BuffDef { get; private set; }
     public int CurrentStacks { get; private set; }
-    public int RemainingDuration { get; private set; } // -1 for infinite
 
-    // Constructor to create it
-    public BuffInstance(BuffDefinitionSO definition, int initialStacks, int duration)
+    // Duration is now intrinsically linked to stacks. 
+    // If this is -1, it is a permanent buff (never ticks down).
+    public int RemainingDuration => CurrentStacks; 
+    private bool _isPermanent;
+
+    public BuffInstance(BuffDefinitionSO definition, int initialStacks, bool isPermanent)
     {
         BuffDef = definition;
         CurrentStacks = initialStacks;
-        RemainingDuration = duration;
+        _isPermanent = isPermanent;
     }
 
-    // Handles adding stacks while respecting the SO rules
     public void AddStacks(int amount)
     {
         CurrentStacks += amount;
@@ -27,18 +29,18 @@ public class BuffInstance
         Debug.Log($"[{BuffDef.buffName}] stacked to {CurrentStacks}!");
     }
 
-    public void DecreaseDuration()
+    public void RemoveStacks(int amount)
     {
-        if (RemainingDuration > 0)
+        CurrentStacks = Mathf.Max(0, CurrentStacks - amount);
+    }
+
+    public void Tick()
+    {
+        if (!_isPermanent && CurrentStacks > 0)
         {
-            RemainingDuration--;
+            CurrentStacks--;
         }
     }
 
-    public void SetRemainingDuration(int duration)
-    {
-        RemainingDuration = Mathf.Max(0, duration);
-    }
-
-    public bool IsExpired => RemainingDuration == 0;
+    public bool IsExpired => !_isPermanent && CurrentStacks <= 0;
 }

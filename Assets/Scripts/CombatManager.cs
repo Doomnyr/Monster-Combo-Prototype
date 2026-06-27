@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Unity.Properties;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -17,207 +18,92 @@ public class CombatManager : MonoBehaviour
         PlayerTeam = readyPlayerTeam;
         EnemyTeam = readyEnemyTeam;
 
-        Debug.Log("CombatManager: Teams received. Generating timeline...");
-        
         StartMatch();
         
-        TriggerOnCombatStartEffects();
-        _turnManager.Initialize(PlayerTeam, EnemyTeam);
+        // Use our consolidated trigger evaluator
+        TriggerCombatTriggers(CombatTriggerTime.OnCombatStart);
         
-
-        PrintMonsterInstances();
+        _turnManager.Initialize(PlayerTeam, EnemyTeam);
         OnCombatDataReady?.Invoke();
     }
 
-    private void StartMatch()
-    {
-        Debug.Log("CombatManager: Match started!");
-    }
-
-    public void PrintMonsterInstances()
-    {
-        List<MonsterInstance> upcomingTurns = _turnManager.GetUpcomingTurns();
-        
-        foreach (var monster in upcomingTurns)
-        {
-            var baseStats = monster.MonsterDef.BaseStats;
-            var buffs = monster.ActiveBuffs;
-
-            string buffString;
-            if (buffs.Count == 0)
-            {
-                buffString = "  (None)";
-            }
-            else
-            {
-                buffString = string.Empty;
-                foreach (var buff in buffs)
-                {
-                    string durationText = buff.RemainingDuration == -1 ? "Permanent" : $"{buff.RemainingDuration} turns left";
-                    string typeTag = buff.BuffDef.isDebuff ? "[DEBUFF]" : "[BUFF]";
-                    buffString += $"  • {typeTag} {buff.BuffDef.buffName} x{buff.CurrentStacks} ({durationText})\n";
-                }
-                buffString = buffString.TrimEnd('\n');
-            }
-
-            string monsterProfile = 
-                $"====== [ {monster.MonsterDef.MonsterName} ] ======\n" +
-                $"• Instance ID: {monster.InstanceId}\n" +
-                $"• Allegiance:  {monster.Team}\n" +
-                $"• Grid Slot:   [Column {monster.GridPosition.Column}, Row {monster.GridPosition.Row}]\n" +
-                $"• Traits:      Race: {monster.MonsterDef.Race} | Element: {monster.MonsterDef.Element}\n" +
-                $"--------------------------------------------------\n" +
-                $"[Active Buffs / Debuffs]\n" +
-                $"{buffString}\n" +
-                $"--------------------------------------------------\n" +
-                $"[Current Vitals]\n" +
-                $"  - HP:   {monster.CurrentHP} / {monster.MaxHP}\n" +
-                $"  - Mana: {monster.CurrentMana} / {monster.MaxMana}\n" +
-                $"[Combat Parameters (Modified)]\n" +
-                $"  - ATK:  {monster.Strength} (Base: {baseStats.strength})  |  DEF:  {monster.Defense} (Base: {baseStats.defense})\n" +
-                $"  - INT:  {baseStats.intelligence}  |  SPD:  {monster.Speed}\n" +
-                $"  - CRIT: {monster.CritChance * 100}% |  MULT: {monster.CritDamageMult}x\n" +
-                $"==================================================";
-
-            Debug.Log(monsterProfile);
-        }
-    }
+    private void StartMatch() => Debug.Log("CombatManager: Match started!");
 
     private void Update()
     {
         if (Keyboard.current != null && Keyboard.current.spaceKey.wasPressedThisFrame)
         {
             ExecuteNextTurn();
-            //PrintMonsterInstances();
         }
     }
 
-    private void TriggerOnCombatStartEffects()
+    /// <summary>
+    /// Consolidated trigger system: Polls buffs and traits for any monster on the battlefield.
+    /// </summary>
+    private void TriggerCombatTriggers(CombatTriggerTime triggerTime)
     {
         List<MonsterInstance> allMonsters = new List<MonsterInstance>();
         allMonsters.AddRange(PlayerTeam);
         allMonsters.AddRange(EnemyTeam);
 
-        Debug.Log("Triger Start of combat effects.");
         foreach (var monster in allMonsters)
         {
-            ProcessTriggers(monster, CombatTriggerTime.OnCombatStart);
+            EvaluateAllTriggers(monster, triggerTime, allMonsters);
         }
     }
 
-    private void ProcessTriggers(MonsterInstance monster, CombatTriggerTime triggerTime)
+    /// <summary>
+    /// Runs all actions (Buffs + Traits) for a specific monster at a specific timing.
+    /// </summary>
+    private void EvaluateAllTriggers(MonsterInstance monster, CombatTriggerTime triggerTime, List<MonsterInstance> battlefield)
     {
-        Debug.Log($"[CombatManager] Processing {triggerTime} for {monster.MonsterDef.MonsterName}");
-        List<MonsterInstance> battlefield = new List<MonsterInstance>();
-        battlefield.AddRange(PlayerTeam);
-        battlefield.AddRange(EnemyTeam);
-        
-        // 2. Process Buff Triggers
+        // 1. Buff Actions (Accessing via Buffs collection directly)
         var buffActions = monster.Buffs.GetTriggeredActions(triggerTime);
-        foreach (var action in buffActions) 
-        {
-            Debug.Log("Found buff to trigger!");
-            ExecuteSkillAction(action, monster, battlefield);
-        }
+        foreach (var action in buffActions) ExecuteSkillAction(action, monster, battlefield);
 
-        // 3. Process Trait Triggers
-        // (You will add this method to MonsterInstance shortly)
-        var traitActions = monster.GetTriggeredTraitActions(triggerTime);
-        foreach (var action in traitActions) 
-        {
-            Debug.Log("Found trait to trigger!");
-            ExecuteSkillAction(action, monster, battlefield);
-        }
+        // 2. Trait Actions
+        var traitActions = monster.Traits.GetTriggeredActions(triggerTime);
+        foreach (var action in traitActions) ExecuteSkillAction(action, monster, battlefield);
     }
 
     private void ExecuteNextTurn()
     {
-        // 4. Ask the TurnManager for the next monster
         MonsterInstance activeMonster = _turnManager.GetNextTurn();
+        if (activeMonster == null) return;
 
-        // If it returns null, everyone is dead!
-        if (activeMonster == null)
-        {
-            Debug.Log("Combat is over! The turn queue is empty.");
-            return;
-        }
-
-        // 1. Gather all living units on the battlefield for target finding
         List<MonsterInstance> battlefield = new List<MonsterInstance>();
         battlefield.AddRange(PlayerTeam);
         battlefield.AddRange(EnemyTeam);
 
-        // 2. TRIGGER: OnTurnStart Buffs (e.g., Regen heals here!)
-        EvaluateBuffTriggers(activeMonster, CombatTriggerTime.OnTurnStart, battlefield);
+        // 1. Turn Start Triggers
+        EvaluateAllTriggers(activeMonster, CombatTriggerTime.OnTurnStart, battlefield);
 
-        if (activeMonster.IsDefeated) return; // Guard in case turn-start debuffs fainted them
+        if (activeMonster.IsDefeated) return;
 
-        // 3. Grab and use its first assigned skill
-        if (activeMonster.MonsterDef.CommandPriorityList.Count == 0)
+        // 2. Execute Primary Skill
+        if (activeMonster.MonsterDef.CommandPriorityList.Count > 0)
         {
-            Debug.LogWarning($"{activeMonster.MonsterDef.MonsterName} has no skills assigned!");
-            _turnManager.RequeueCombatant(activeMonster); // Requeue instead of Enqueue
-            return;
+            ExecuteSkill(activeMonster.MonsterDef.CommandPriorityList[0], activeMonster, battlefield);
         }
-        
-        SkillDefinitionSO chosenSkill = activeMonster.MonsterDef.CommandPriorityList[0];
-        Debug.Log($"--- [TURN] {activeMonster.MonsterDef.MonsterName} is using {chosenSkill.SkillName}! ---");
-        ExecuteSkill(chosenSkill, activeMonster, battlefield);
 
+        // 3. Turn End Triggers
+        EvaluateAllTriggers(activeMonster, CombatTriggerTime.OnTurnEnd, battlefield);
 
-        // 4. TRIGGER: OnTurnEnd Buffs (e.g., Poison ticks damage here!)
-        EvaluateBuffTriggers(activeMonster, CombatTriggerTime.OnTurnEnd, battlefield);
-
-        // 5. Tick down status durations at the end of the monster's turn
-        activeMonster.TickBuffDurations();
-
-        // 6. Tell the TurnManager to put them at the back of the line!
+        // 4. Cleanup (Accessing Buffs collection directly)
+        activeMonster.Buffs.TickDurations();
         _turnManager.RequeueCombatant(activeMonster);
     }
 
-    private void EvaluateAllTriggers(MonsterInstance monster, CombatTriggerTime triggerTime, List<MonsterInstance> battlefield)
-    {
-        // 1. Get Triggered Buff Actions (Existing)
-        var buffActions = monster.GetTriggeredBuffActions(triggerTime);
-        foreach (var action in buffActions) ExecuteSkillAction(action, monster, battlefield);
-
-        // 2. Get Triggered Trait Actions (NEW)
-        var traitActions = monster.GetTriggeredTraitActions(triggerTime);
-        foreach (var action in traitActions) ExecuteSkillAction(action, monster, battlefield);
-    }
-
-    /// <summary>
-    /// Evaluates and runs active actions registered directly on the active unit's active buffs.
-    /// </summary>
-    private void EvaluateBuffTriggers(MonsterInstance monster, CombatTriggerTime triggerTime, List<MonsterInstance> battlefield)
-    {
-        List<SkillAction> triggeredActions = monster.GetTriggeredBuffActions(triggerTime);
-        if (triggeredActions.Count == 0) return;
-
-        Debug.Log($"[BUFF TRIGGER] Evaluating {triggerTime} triggers for {monster.MonsterDef.MonsterName}...");
-        foreach (SkillAction action in triggeredActions)
-        {
-            ExecuteSkillAction(action, monster, battlefield);
-        }
-    }
-
-    /// <summary>
-    /// Highly unified skill execution logic. Reused for both standard Skills AND Buff triggers!
-    /// </summary>
     public void ExecuteSkill(SkillDefinitionSO skill, MonsterInstance caster, List<MonsterInstance> battlefield)
     {
-        // This holds the targets we want to pass to the NEXT "Previous Selection" action
         List<MonsterInstance> lastSuccessfulTargets = new List<MonsterInstance>();
 
         foreach (SkillAction action in skill.Actions)
         {
-            // 1. Get targets for this action
-            // We pass 'lastSuccessfulTargets' so Target_PreviousSelection can find them
             List<MonsterInstance> currentActionTargets = action.targetFinder.FindTargets(
                 action, caster, battlefield, lastSuccessfulTargets
             );
 
-            // 2. Drop the payload on the CURRENT action's targets
             foreach (MonsterInstance target in currentActionTargets)
             {
                 if (target != null && target.IsAlive)
@@ -226,8 +112,6 @@ public class CombatManager : MonoBehaviour
                 }
             }
 
-            // 3. ONLY update lastSuccessfulTargets if this action actually found people
-            // This ensures the "Previous Selection" stays valid for the whole chain
             if (currentActionTargets.Count > 0)
             {
                 lastSuccessfulTargets = currentActionTargets;
@@ -237,12 +121,8 @@ public class CombatManager : MonoBehaviour
 
     private void ExecuteSkillAction(SkillAction action, MonsterInstance caster, List<MonsterInstance> battlefield)
     {
-        // A. Resolve Targets
-        // Now using the "Previous Target" logic we discussed
-        List<MonsterInstance> targets = action.targetFinder.FindTargets(action, caster, battlefield);
+        List<MonsterInstance> targets = action.targetFinder.FindTargets(action, caster, battlefield, null);
         
-    
-        // B. Drop the Payload
         foreach (MonsterInstance target in targets)
         {
             if (target != null && target.IsAlive)
@@ -250,7 +130,5 @@ public class CombatManager : MonoBehaviour
                 action.executionEffect.Apply(action, caster, target);
             }
         }
-
-
     }
 }
