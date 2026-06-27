@@ -10,8 +10,12 @@ public class CombatTooltipManager : MonoBehaviour
     [Header("UI Components")]
     [SerializeField] private GameObject tooltipPanel;
     [SerializeField] private TextMeshProUGUI nameText;
-    [SerializeField] private TextMeshProUGUI statsText;
-    [SerializeField] private TextMeshProUGUI buffsText;
+    [SerializeField] private TextMeshProUGUI maxHPText;
+    [SerializeField] private TextMeshProUGUI maxManaText;
+    [SerializeField] private TextMeshProUGUI strText;
+    [SerializeField] private TextMeshProUGUI defText;
+    [SerializeField] private TextMeshProUGUI intText;
+    [SerializeField] private TextMeshProUGUI spdText;
 
     [Header("Pin Settings")]
     [SerializeField] private float screenMargin = 40f; // Gap between the tooltip and the screen edge
@@ -60,15 +64,13 @@ public class CombatTooltipManager : MonoBehaviour
         // 1. Set Identity
         nameText.text = $"{monster.MonsterDef.MonsterName}";
 
-        // 2. Format Core Stats string
-        StringBuilder statsSb = new StringBuilder();
-        statsSb.AppendLine($"HP: {monster.CurrentHP} / {baseStats.maxHP}");
-        statsSb.AppendLine($"Mana: {monster.CurrentMana} / {baseStats.maxMana}");
-        statsSb.AppendLine($"ATK: {monster.Strength} <size=80%>(Base: {baseStats.strength})</size>");
-        statsSb.AppendLine($"INT: {monster.Intelligence} <size=80%>(Base: {baseStats.intelligence})</size>");
-        statsSb.AppendLine($"DEF: {monster.Defense} <size=80%>(Base: {baseStats.defense})</size>");
-        statsSb.AppendLine($"SPD: {baseStats.speed}");
-        statsText.text = statsSb.ToString();
+        maxHPText.text = ($"{baseStats.maxHP} ({monster.CurrentHP}) ");
+        maxManaText.text = ($"{baseStats.maxMana} ({monster.CurrentMana}) ");
+        strText.text = ($"{baseStats.strength} ({monster.Strength}) ");
+        defText.text = ($"{baseStats.defense} ({monster.Defense}) ");
+        intText.text = ($"{baseStats.intelligence} ({monster.Intelligence}) ");
+        spdText.text = ($"{baseStats.speed} ({monster.Speed}) ");
+
 
         // 3. Format Buffs/Debuffs string with rich text color tags
         StringBuilder buffsSb = new StringBuilder();
@@ -85,7 +87,7 @@ public class CombatTooltipManager : MonoBehaviour
                 buffsSb.AppendLine($"{colorTag}• {buff.BuffDef.buffName} x{buff.CurrentStacks}</color> ({duration})");
             }
         }
-        buffsText.text = buffsSb.ToString();
+        //buffsText.text = buffsSb.ToString();
         
         UpdateTooltipPosition();
     }
