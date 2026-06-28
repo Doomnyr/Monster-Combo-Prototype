@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [System.Serializable]
-public class MonsterInstance : IHealthObservable, IManaObservable
+public class MonsterInstance : IHealthObservable, IManaObservable, IBuffBarObservable
 {
     // Identity & Setup
     public string InstanceId { get; private set; }
@@ -21,6 +21,7 @@ public class MonsterInstance : IHealthObservable, IManaObservable
     public event Action<float, float> OnManaChanged;
     public event Action<int> OnDamageTaken;
     public event Action<int> OnHealed;
+    public event Action OnBuffsChanged;
     
     public MonsterBuffCollection Buffs { get; private set; }
     public IReadOnlyList<BuffInstance> ActiveBuffs => Buffs.ActiveBuffs;
@@ -128,7 +129,10 @@ public class MonsterInstance : IHealthObservable, IManaObservable
         Team = team;
         gridPosition = startingPosition;
 
+
         Buffs = new MonsterBuffCollection();
+
+        Buffs.OnBuffsChanged += () => OnBuffsChanged?.Invoke();
         Buffs.OnBuffsChanged += RecalculateDerivedStats;
 
         Traits = new MonsterTraitCollection(traits);
