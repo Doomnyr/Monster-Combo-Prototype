@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [System.Serializable]
-public class MonsterInstance : IHealthObservable, IManaObservable
+public class MonsterInstance : IHealthObservable, IManaObservable, IBuffBarObservable
 {
     // Identity & Setup
     public string InstanceId { get; private set; }
@@ -21,12 +21,12 @@ public class MonsterInstance : IHealthObservable, IManaObservable
     public event Action<float, float> OnManaChanged;
     public event Action<int> OnDamageTaken;
     public event Action<int> OnHealed;
-    public event Action<BuffDefinitionSO, int> OnBuffApplied;  // (Buff, Stacks Added)
-    public event Action<BuffDefinitionSO> OnBuffRemoved;
+    public event Action OnBuffsChanged;
     
     public MonsterBuffCollection Buffs { get; private set; }
     public IReadOnlyList<BuffInstance> ActiveBuffs => Buffs.ActiveBuffs;
-    public List<TraitDefinitionSO> Traits { get; private set; }
+    //public List<TraitDefinitionSO> Traits { get; private set; }
+    public MonsterTraitCollection Traits { get; private set; }
 
     private float _cachedMaxHP;
     private float _cachedMaxMana;
@@ -122,47 +122,6 @@ public class MonsterInstance : IHealthObservable, IManaObservable
         Debug.Log($"{this.MonsterDef.MonsterName} has fainted!");
     }
 
-    public void AddBuff(BuffDefinitionSO buffDef, int stacks, int duration)
-    {
-        Buffs.AddBuff(buffDef, stacks, duration);
-    }
-
-    public bool RemoveBuff(BuffDefinitionSO buffDef)
-    {
-        return Buffs.RemoveBuff(buffDef);
-    }
-
-    public bool SetBuffDuration(BuffDefinitionSO buffDef, int duration)
-    {
-        return Buffs.SetBuffDuration(buffDef, duration);
-    }
-
-    public void TickBuffDurations()
-    {
-        Buffs.TickDurations();
-    }
-
-    public List<SkillAction> GetTriggeredBuffActions(CombatTriggerTime triggerTime)
-    {
-        return Buffs.GetTriggeredActions(triggerTime);
-    }
-
-    public List<SkillAction> GetTriggeredTraitActions(CombatTriggerTime triggerTime)
-    {
-        List<SkillAction> actions = new List<SkillAction>();
-        foreach (var trait in Traits)
-        {
-            foreach (var trigger in trait.triggeredActions) // Assuming TraitDefinitionSO has this list
-            {
-                if (trigger.triggerTime == triggerTime)
-                {
-                    actions.Add(trigger.actionToTrigger);
-                }
-            }
-        }
-        return actions;
-    }
-
     public MonsterInstance(MonsterDefinitionSO monsterDef, CombatTeam team, GridPosition startingPosition, List<TraitDefinitionSO> traits)
     {
         MonsterDef = monsterDef ?? throw new ArgumentNullException(nameof(monsterDef));
@@ -170,16 +129,16 @@ public class MonsterInstance : IHealthObservable, IManaObservable
         Team = team;
         gridPosition = startingPosition;
 
+
         Buffs = new MonsterBuffCollection();
+
+        Buffs.OnBuffsChanged += () => OnBuffsChanged?.Invoke();
         Buffs.OnBuffsChanged += RecalculateDerivedStats;
 
-        Buffs.OnBuffApplied += (buffDef, stacks) => OnBuffApplied?.Invoke(buffDef, stacks);
-        Buffs.OnBuffRemoved += (buffDef) => OnBuffRemoved?.Invoke(buffDef);
-
-        Traits = traits ?? new List<TraitDefinitionSO>();
+        Traits = new MonsterTraitCollection(traits);
 
         _currentHP = monsterDef.BaseStats.maxHP;
-        _currentMana = monsterDef.BaseStats.maxMana;
+        _currentMana = monsterDef.BaseStats.maxMana * 0.5f; // Only start with half mana
         RecalculateDerivedStats();
     }
 }

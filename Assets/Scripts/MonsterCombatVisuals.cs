@@ -26,8 +26,8 @@ public class MonsterCombatVisuals : MonoBehaviour
             // Subscribe to the new events we made!
             _trackedMonster.OnDamageTaken += SpawnDamageText;
             _trackedMonster.OnHealed += SpawnHealText;
-            _trackedMonster.OnBuffApplied += SpawnBuffAppliedText;
-            _trackedMonster.OnBuffRemoved += SpawnBuffRemovedText;
+            _trackedMonster.Buffs.OnBuffApplied += SpawnBuffAppliedText;
+            _trackedMonster.Buffs.OnBuffRemoved += SpawnBuffRemovedText;
         }
     }
 
@@ -42,8 +42,8 @@ public class MonsterCombatVisuals : MonoBehaviour
         {
             _trackedMonster.OnDamageTaken -= SpawnDamageText;
             _trackedMonster.OnHealed -= SpawnHealText;
-            _trackedMonster.OnBuffApplied -= SpawnBuffAppliedText;
-            _trackedMonster.OnBuffRemoved -= SpawnBuffRemovedText;
+            _trackedMonster.Buffs.OnBuffApplied -= SpawnBuffAppliedText;
+            _trackedMonster.Buffs.OnBuffRemoved -= SpawnBuffRemovedText;
         }
     }
 

@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using Unity.Mathematics;
 
 [System.Serializable]
 public struct TeamSlotConfiguration
