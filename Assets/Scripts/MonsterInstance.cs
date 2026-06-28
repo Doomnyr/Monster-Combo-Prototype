@@ -134,7 +134,7 @@ public class MonsterInstance : IHealthObservable, IManaObservable
         Traits = new MonsterTraitCollection(traits);
 
         _currentHP = monsterDef.BaseStats.maxHP;
-        _currentMana = monsterDef.BaseStats.maxMana;
+        _currentMana = monsterDef.BaseStats.maxMana * 0.5f; // Only start with half mana
         RecalculateDerivedStats();
     }
 }

@@ -4,10 +4,6 @@ public class BuffInstance
 {
     public BuffDefinitionSO BuffDef { get; private set; }
     public int CurrentStacks { get; private set; }
-
-    // Duration is now intrinsically linked to stacks. 
-    // If this is -1, it is a permanent buff (never ticks down).
-    public int RemainingDuration => CurrentStacks; 
     private bool _isPermanent;
 
     public BuffInstance(BuffDefinitionSO definition, int initialStacks, bool isPermanent)
@@ -19,11 +15,13 @@ public class BuffInstance
 
     public void AddStacks(int amount)
     {
-        CurrentStacks += amount;
-
         if (!BuffDef.infiniteStacks && CurrentStacks > BuffDef.maxStacks)
         {
             CurrentStacks = BuffDef.maxStacks;
+        }
+        else
+        {
+            CurrentStacks += amount;
         }
         
         Debug.Log($"[{BuffDef.buffName}] stacked to {CurrentStacks}!");

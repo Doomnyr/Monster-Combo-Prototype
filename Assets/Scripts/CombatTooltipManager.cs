@@ -82,9 +82,7 @@ public class CombatTooltipManager : MonoBehaviour
         {
             foreach (var buff in monster.ActiveBuffs)
             {
-                string colorTag = buff.BuffDef.isDebuff ? "<color=#FF4444>" : "<color=#44FF44>";
-                string duration = buff.RemainingDuration == -1 ? "Perm" : $"{buff.RemainingDuration}t";
-                buffsSb.AppendLine($"{colorTag}• {buff.BuffDef.buffName} x{buff.CurrentStacks}</color> ({duration})");
+                buffsSb.AppendLine($"{buff.BuffDef.buffName} x{buff.CurrentStacks}</color>)");
             }
         }
         //buffsText.text = buffsSb.ToString();

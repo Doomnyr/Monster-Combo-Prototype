@@ -2,18 +2,10 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-/// <summary>
-/// The "Traffic Controller" from our Architecture Plan.
-/// Responsible strictly for a continuous rolling queue of combatants.
-/// </summary>
 public class TurnManager
 {
     private Queue<MonsterInstance> _turnQueue = new Queue<MonsterInstance>();
 
-    /// <summary>
-    /// Feed the manager the active teams at the start of combat.
-    /// Sets up the initial turn order based on Speed.
-    /// </summary>
     public void Initialize(List<MonsterInstance> playerTeam, List<MonsterInstance> enemyTeam)
     {
         _turnQueue.Clear();
@@ -21,6 +13,9 @@ public class TurnManager
         List<MonsterInstance> allCombatants = new List<MonsterInstance>();
         allCombatants.AddRange(playerTeam);
         allCombatants.AddRange(enemyTeam);
+
+        // Add monster to inspector
+
 
         // Sort all living monsters by Speed for the very first setup (highest goes first!)
         var sortedCombatants = allCombatants

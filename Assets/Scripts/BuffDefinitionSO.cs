@@ -7,9 +7,10 @@ public class BuffDefinitionSO : ScriptableObject
 {
     [Header("Identity")]
     public string buffName;
-    public bool isDebuff; 
     public Sprite buffIcon;
     public BuffType buffType;
+
+    public bool isDebuff; 
 
     [Header("Stacking Rules")]
     public int maxStacks = 1;
@@ -38,7 +39,5 @@ public struct StatModifierData
 public struct BuffTriggerData
 {
     public CombatTriggerTime triggerTime;
-    
-    [Tooltip("Reusing our SkillAction! E.g., TargetSelf + Effect_Damage")]
     public SkillAction actionToTrigger; 
 }
