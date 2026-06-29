@@ -12,13 +12,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bc3fa1453d480dd4cb0973dfe4b536fa, type: 3}
   m_Name: Might
   m_EditorClassIdentifier: Assembly-CSharp::BuffDefinitionSO
-  buffName: Might
-  isDebuff: 0
-  buffIcon: {fileID: 21300000, guid: ba76f765830716245a0563b80137d3ba, type: 3}
-  maxStacks: 10
-  infiniteStacks: 0
-  statModifiers:
+  _name: Might
+  _icon: {fileID: 21300000, guid: ba76f765830716245a0563b80137d3ba, type: 3}
+  _type: 0
+  _isHidden: 0
+  _isDebuff: 0
+  _maxStacks: 10
+  _isPermanent: 0
+  _statModifiers:
   - statToModify: 2
-    modifierType: 2
-    valuePerStack: 1.02
-  triggeredActions: []
+    modifierType: 1
+    valuePerStack: 0.02
+  _triggerActions: []

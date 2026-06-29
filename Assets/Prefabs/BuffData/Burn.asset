@@ -12,22 +12,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bc3fa1453d480dd4cb0973dfe4b536fa, type: 3}
   m_Name: Burn
   m_EditorClassIdentifier: Assembly-CSharp::BuffDefinitionSO
-  buffName: Burn
-  isDebuff: 1
-  buffIcon: {fileID: 21300000, guid: 4ac3091fed4b06d439789e4159e4220e, type: 3}
-  buffType: 1
-  maxStacks: 100
-  infiniteStacks: 0
-  statModifiers: []
-  triggeredActions:
-  - triggerTime: 1
+  _name: Burn
+  _icon: {fileID: 21300000, guid: 4ac3091fed4b06d439789e4159e4220e, type: 3}
+  _type: 1
+  _isHidden: 0
+  _isDebuff: 0
+  _maxStacks: 100
+  _isPermanent: 1
+  _statModifiers: []
+  _triggerActions:
+  - triggerTime: 2
     actionToTrigger:
       targetFinder: {fileID: 11400000, guid: 74aee106783430b43b381bdbfd2e1037, type: 2}
       executionEffect: {fileID: 11400000, guid: 30c38d1906bb3594693a1edb0f2d7e92, type: 2}
       element: 6
-      baseValue: 8
-      scalingStat: 0
-      scalingCoefficient: 0
+      baseValue: 20
+      scalingStat: 2
+      scalingCoefficient: 1
       buffToApply: {fileID: 0}
       buffCount: 0
       buffduration: 0

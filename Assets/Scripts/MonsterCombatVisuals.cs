@@ -59,14 +59,14 @@ public class MonsterCombatVisuals : MonoBehaviour
 
     private void SpawnBuffAppliedText(BuffDefinitionSO buff, int stacks)
     {    
-        Color textCol = buff.isDebuff ? debuffColor : buffColor;
-        string prefix = buff.isDebuff ? "▼" : "▲";
-        CreateFloatingText($"{prefix} {buff.buffName} +{stacks}", textCol, buff.buffIcon);
+        Color textCol = buff.IsDebuff ? debuffColor : buffColor;
+        string prefix = buff.IsDebuff ? "▼" : "▲";
+        CreateFloatingText($"{prefix} {buff.name} +{stacks}", textCol, buff.Icon);
     }
 
     private void SpawnBuffRemovedText(BuffDefinitionSO buff)
     {
-        CreateFloatingText($"{buff.buffName} Expired", Color.gray, buff.buffIcon);
+        CreateFloatingText($"{buff.name} Expired", Color.gray, buff.Icon);
     }
 
     private void CreateFloatingText(string message, Color color, Sprite buffIcon)

@@ -17,8 +17,8 @@ public class Effect_Damage : SkillEffectSO
             skill.element
         );
 
-        Debug.Log($"[COMBAT] {caster.MonsterDef.MonsterName} ({caster.MonsterDef.Element}) used a " +
-                  $"{skill.element} Skill scaling with {skill.scalingStat} on {target.MonsterDef.MonsterName} ({target.MonsterDef.Element}) for {finalDamage} damage!");
+        Debug.Log($"[COMBAT] {caster.MonsterDef.Name} ({caster.MonsterDef.Element}) used a " +
+                  $"{skill.element} Skill scaling with {skill.scalingStat} on {target.MonsterDef.Name} ({target.MonsterDef.Element}) for {finalDamage} damage!");
 
         target.TakeDamage(finalDamage);
     }

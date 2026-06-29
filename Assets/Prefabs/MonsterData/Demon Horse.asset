@@ -12,22 +12,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d4d675410e554c346beddfb05de04bff, type: 3}
   m_Name: Demon Horse
   m_EditorClassIdentifier: Assembly-CSharp::MonsterDefinitionSO
-  monsterName: Demon Horse
-  monsterSprite: {fileID: 21300000, guid: c10edc547980b934c8c2a32e8cac7eb6, type: 3}
+  _name: Hell Horse
+  sprite: {fileID: 21300000, guid: c10edc547980b934c8c2a32e8cac7eb6, type: 3}
   race: 0
   element: 1
-  baseStats:
-    maxHP: 400
+  _baseStats:
+    maxHP: 450
     maxMana: 100
-    strength: 50
-    defense: 50
-    intelligence: 45
+    strength: 75
+    defense: 75
+    intelligence: 50
     speed: 120
     critChance: 0.05
     critDamageMult: 1.5
     DodgeChance: 0
-  traits:
-  - {fileID: 11400000, guid: 387cc00e9d4b03b448b5f437daca67f0, type: 2}
   commandPriorityList:
   - {fileID: 11400000, guid: 39cf6c1667ac39e4ebb9759a132d4e7b, type: 2}
   - {fileID: 11400000, guid: 56b40c84422297b4ea99abb68f5dcb1f, type: 2}

@@ -9,9 +9,9 @@ public class BuffIconUI : MonoBehaviour
 
     public void Setup(BuffDefinitionSO buffDef, int stacks)
     {
-        if (buffDef.buffIcon != null)
+        if (buffDef.Icon != null)
         {
-            iconImage.sprite = buffDef.buffIcon;
+            iconImage.sprite = buffDef.Icon;
             iconImage.enabled = true;
         }
 
@@ -27,7 +27,7 @@ public class BuffIconUI : MonoBehaviour
         }
 
         // Optional: Tint red if it's a debuff
-        if (buffDef.isDebuff)
+        if (buffDef.IsDebuff)
         {
             iconImage.color = new Color(1f, 0.5f, 0.5f); // Light red tint
         }

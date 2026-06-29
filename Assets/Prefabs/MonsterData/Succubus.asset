@@ -12,17 +12,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d4d675410e554c346beddfb05de04bff, type: 3}
   m_Name: Succubus
   m_EditorClassIdentifier: Assembly-CSharp::MonsterDefinitionSO
-  monsterName: Succubus
-  monsterSprite: {fileID: 21300000, guid: d760cca8d060033478aec42510721b60, type: 3}
+  _name: Demon
+  sprite: {fileID: 21300000, guid: d760cca8d060033478aec42510721b60, type: 3}
   race: 1
-  element: 6
-  baseStats:
+  element: 1
+  _baseStats:
     maxHP: 450
     maxMana: 100
-    strength: 50
+    strength: 60
     defense: 50
-    intelligence: 100
-    speed: 150
+    intelligence: 120
+    speed: 40
     critChance: 0.05
     critDamageMult: 1.5
     DodgeChance: 0

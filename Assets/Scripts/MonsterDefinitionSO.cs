@@ -6,26 +6,26 @@ using Microsoft.Unity.VisualStudio.Editor;
 public class MonsterDefinitionSO : ScriptableObject
 {
     [Header("Monster Identity")]
-    [SerializeField] private string monsterName;
-    [SerializeField] private Sprite monsterSprite;
+    [SerializeField] private string _name;
+    [SerializeField] private Sprite sprite;
     [SerializeField] private MonsterRace race;
     [SerializeField] private ElementType element;
 
     [Header("Base Attribute Settings")]
-    [SerializeField] private StatBlock baseStats;
+    [SerializeField] private StatBlock _baseStats;
 
     [Header("Traits")]
-    public List<TraitDefinitionSO> traits;
+    private List<TraitDefinitionSO> traits;
 
     [Header("AI Command Priority List")]
     [Tooltip("The engine reads this from top to bottom. It will execute the first skill it can afford and/or is valid.")]
     [SerializeField] private List<SkillDefinitionSO> commandPriorityList = new List<SkillDefinitionSO>();
 
-    public string MonsterName => monsterName;
-    public Sprite MonsterSprite => monsterSprite;
+    public string Name => _name;
+    public Sprite MonsterSprite => sprite;
     public MonsterRace Race => race;
     public ElementType Element => element;
-    public StatBlock BaseStats => baseStats;
+    public StatBlock BaseStats => _baseStats;
     public List<SkillDefinitionSO> CommandPriorityList => commandPriorityList;
     public List<TraitDefinitionSO> Traits => traits;
 }

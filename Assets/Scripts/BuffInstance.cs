@@ -1,30 +1,31 @@
+using System;
 using UnityEngine;
 
 public class BuffInstance
 {
     public BuffDefinitionSO BuffDef { get; private set; }
     public int CurrentStacks { get; private set; }
-    private bool _isPermanent;
+    public bool IsPermanent;
 
-    public BuffInstance(BuffDefinitionSO definition, int initialStacks, bool isPermanent)
+    public BuffInstance(BuffDefinitionSO buffDef, int stacks, bool isPermanent)
     {
-        BuffDef = definition;
-        CurrentStacks = initialStacks;
-        _isPermanent = isPermanent;
+        BuffDef = buffDef;
+        CurrentStacks = Math.Clamp(stacks, 1, BuffDef.MaxStacks);
+        IsPermanent = isPermanent;
     }
 
     public void AddStacks(int amount)
-    {
-        if (!BuffDef.infiniteStacks && CurrentStacks > BuffDef.maxStacks)
+    {   
+        if(CurrentStacks + amount > BuffDef.MaxStacks)
         {
-            CurrentStacks = BuffDef.maxStacks;
+            CurrentStacks = BuffDef.MaxStacks;
         }
         else
         {
             CurrentStacks += amount;
         }
         
-        Debug.Log($"[{BuffDef.buffName}] stacked to {CurrentStacks}!");
+        Debug.Log($"[{BuffDef.name}] stacked to {CurrentStacks}!");
     }
 
     public void RemoveStacks(int amount)
@@ -34,11 +35,11 @@ public class BuffInstance
 
     public void Tick()
     {
-        if (!_isPermanent && CurrentStacks > 0)
+        if (!IsPermanent && CurrentStacks > 0)
         {
             CurrentStacks--;
         }
     }
 
-    public bool IsExpired => !_isPermanent && CurrentStacks <= 0;
+    public bool IsExpired => !IsPermanent && CurrentStacks <= 0;
 }

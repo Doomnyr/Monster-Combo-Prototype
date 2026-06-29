@@ -16,7 +16,7 @@ public class ModifyManaEffect : SkillEffectSO
         float manaGained = target.MaxMana * maxManaPercentage;
             
         target.CurrentMana += manaGained;
-        Debug.Log($"[Skill Engine] {target.MonsterDef.MonsterName} recovered {manaGained} mana.");
+        Debug.Log($"[Skill Engine] {target.MonsterDef.Name} recovered {manaGained} mana.");
 
     }
 }

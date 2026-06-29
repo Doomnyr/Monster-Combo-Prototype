@@ -12,7 +12,7 @@ public class Effect_Damage_Burn : SkillEffectSO
     {
         if (!target.IsAlive) return;
         
-        var matchingBuff = target.ActiveBuffs.FirstOrDefault(b => b.BuffDef.buffType == _requiredBuffType);
+        var matchingBuff = target.ActiveBuffs.FirstOrDefault(b => b.BuffDef.Type == _requiredBuffType);
         
         int stackMultiplier = (matchingBuff != null) ? matchingBuff.CurrentStacks : 0;
         float finalDamage = skill.baseValue * stackMultiplier;
@@ -24,7 +24,7 @@ public class Effect_Damage_Burn : SkillEffectSO
         //   (int)skill.baseValue
         //);
 
-        Debug.Log($"[END OF TURN] {caster.MonsterDef.MonsterName} takes ({finalDamage}) of burn damage!");
+        Debug.Log($"[END OF TURN] {caster.MonsterDef.Name} takes ({finalDamage}) of burn damage!");
 
         target.TakeDamage((int)finalDamage);
     }

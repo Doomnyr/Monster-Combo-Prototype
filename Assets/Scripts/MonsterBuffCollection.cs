@@ -16,6 +16,8 @@ public class MonsterBuffCollection
     {
         if (buffDef == null) throw new ArgumentNullException(nameof(buffDef));
 
+
+
         bool isPermanent = stacks == -1;
         
         BuffInstance existingBuff = activeBuffs.Find(b => b.BuffDef == buffDef);
@@ -65,7 +67,7 @@ public class MonsterBuffCollection
         List<SkillAction> actionsToRun = new List<SkillAction>();
         foreach (var buff in activeBuffs)
         {
-            foreach (var trigger in buff.BuffDef.triggeredActions)
+            foreach (var trigger in buff.BuffDef.TriggerActions)
             {
                 if (trigger.triggerTime == triggerTime)
                 {
@@ -87,7 +89,7 @@ public class MonsterBuffCollection
 
         foreach (var buff in activeBuffs)
         {
-            foreach (var modifier in buff.BuffDef.statModifiers)
+            foreach (var modifier in buff.BuffDef.StatModifiers)
             {
                 if (modifier.statToModify != statType) continue;
 

@@ -42,7 +42,7 @@ public class CombatUIController : MonoBehaviour
             {
                 // We pass the same monster instance as both the health and mana observable target
                 uiSlots[targetUiIndex].Bind(
-                    monster.MonsterDef.MonsterName,
+                    monster.MonsterDef.Name,
                     monster.MonsterDef.MonsterSprite, 
                     monster, // Implicitly cast to IHealthObservable
                     monster,  // Implicitly cast to IManaObservable

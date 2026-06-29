@@ -62,7 +62,7 @@ public class CombatTooltipManager : MonoBehaviour
         var baseStats = monster.MonsterDef.BaseStats;
 
         // 1. Set Identity
-        nameText.text = $"{monster.MonsterDef.MonsterName}";
+        nameText.text = $"{monster.MonsterDef.Name}";
 
         maxHPText.text = ($"{baseStats.maxHP} ({monster.CurrentHP}) ");
         maxManaText.text = ($"{baseStats.maxMana} ({monster.CurrentMana}) ");
@@ -82,7 +82,7 @@ public class CombatTooltipManager : MonoBehaviour
         {
             foreach (var buff in monster.ActiveBuffs)
             {
-                buffsSb.AppendLine($"{buff.BuffDef.buffName} x{buff.CurrentStacks}</color>)");
+                buffsSb.AppendLine($"{buff.BuffDef.name} x{buff.CurrentStacks}</color>)");
             }
         }
         //buffsText.text = buffsSb.ToString();

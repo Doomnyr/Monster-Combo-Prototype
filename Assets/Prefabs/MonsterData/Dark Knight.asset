@@ -12,19 +12,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d4d675410e554c346beddfb05de04bff, type: 3}
   m_Name: Dark Knight
   m_EditorClassIdentifier: Assembly-CSharp::MonsterDefinition
-  monsterName: 1 Dark Knight
-  monsterSprite: {fileID: 21300000, guid: 72f8aab2dd0d5ad419d9b5323f7e4267, type: 3}
+  _name: Dark Knight
+  sprite: {fileID: 21300000, guid: 72f8aab2dd0d5ad419d9b5323f7e4267, type: 3}
   race: 2
-  element: 6
-  baseStats:
+  element: 5
+  _baseStats:
     maxHP: 600
     maxMana: 100
     strength: 100
-    defense: 75
-    intelligence: 100
-    speed: 60
+    defense: 50
+    intelligence: 60
+    speed: 90
     critChance: 0.05
-    critDamageMult: 1.5
+    critDamageMult: 1
     DodgeChance: 0
   commandPriorityList:
   - {fileID: 11400000, guid: 24d1858fe6bd8844dbcf51d008b8fffd, type: 2}

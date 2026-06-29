@@ -96,7 +96,7 @@ public class MonsterInstance : IHealthObservable, IManaObservable, IBuffBarObser
         CurrentHP -= damageAmount;
 
         OnDamageTaken?.Invoke(damageAmount);
-        Debug.Log($"{this.MonsterDef.MonsterName} took {damageAmount} damage! Current HP: {CurrentHP}/{MaxHP}");
+        Debug.Log($"{this.MonsterDef.Name} took {damageAmount} damage! Current HP: {CurrentHP}/{MaxHP}");
 
         if (CurrentHP <= 0)
         {
@@ -109,7 +109,7 @@ public class MonsterInstance : IHealthObservable, IManaObservable, IBuffBarObser
         CurrentHP -= healAmount;
 
         OnHealed?.Invoke(healAmount);
-        Debug.Log($"{this.MonsterDef.MonsterName} was healed {healAmount}! Current HP: {CurrentHP}/{MaxHP}");
+        Debug.Log($"{this.MonsterDef.Name} was healed {healAmount}! Current HP: {CurrentHP}/{MaxHP}");
 
         if (CurrentHP <= 0)
         {
@@ -119,7 +119,7 @@ public class MonsterInstance : IHealthObservable, IManaObservable, IBuffBarObser
 
     private void Die()
     {
-        Debug.Log($"{this.MonsterDef.MonsterName} has fainted!");
+        Debug.Log($"{this.MonsterDef.Name} has fainted!");
     }
 
     public MonsterInstance(MonsterDefinitionSO monsterDef, CombatTeam team, GridPosition startingPosition, List<TraitDefinitionSO> traits)
