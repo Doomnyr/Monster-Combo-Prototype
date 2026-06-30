@@ -7,6 +7,8 @@ public class GridSlotUI : MonoBehaviour
     [Header("UI Components")]
     [SerializeField] private Slider healthSlider;
     [SerializeField] private Slider manaSlider;
+    [SerializeField] private TextMeshProUGUI currentHealthAmount;
+    [SerializeField] private TextMeshProUGUI currentManaAmount;
     [SerializeField] private TextMeshProUGUI nameText;
     [SerializeField] private Image _monsterSprite;
     
@@ -76,12 +78,14 @@ public class GridSlotUI : MonoBehaviour
     {
         healthSlider.maxValue = maxHP;
         healthSlider.value = currentHP;
+        currentHealthAmount.text = currentHP.ToString();
     }
 
     private void UpdateManaVisuals(float currentMana, float maxMana)
     {
         manaSlider.maxValue = maxMana;
         manaSlider.value = currentMana;
+        currentManaAmount.text = currentMana.ToString();
     }
 
     public void Unbind()
