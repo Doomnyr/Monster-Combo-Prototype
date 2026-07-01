@@ -40,7 +40,7 @@ public class CombatLoader : MonoBehaviour
         {
             if (slot.MonsterDef == null) continue;
 
-            MonsterInstance instance = new MonsterInstance(slot.MonsterDef, team, slot.GridPos, slot.MonsterDef.traits);
+            MonsterInstance instance = new MonsterInstance(slot.MonsterDef, team, slot.GridPos, slot.MonsterDef.Traits);
             instantiatedTeam.Add(instance);
         }
 
