@@ -1,9 +1,9 @@
 {
   "monsters": [
     {
-      "id": "monster_dragon_001",
-      "name": "Green Dragon",
-      "spriteName": "monster_dragon_001",
+      "monsterId": "monster_dragon_001",
+      "monsterName": "Green Dragon",
+      "monsterSprite": "monster_dragon_001",
       "race": "Dragon",
       "element": "Fire",
       "baseStats": {
@@ -16,7 +16,8 @@
         "dodgeChance": 0.0,
         "critChance": 0.05,
         "critDamageMult": 1.5
-      }
+      },
+      "commandList": ["Skill_BurningAssualt", "Skill_BasicAttack"]
     }
   ]
 }

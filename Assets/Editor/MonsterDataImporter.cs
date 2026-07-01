@@ -10,86 +10,80 @@ public static class MonsterDataImporter
     public static void ImportMonsters()
     {
         string jsonPath = Path.Combine(Application.dataPath, "Data/monsters.json");
-        string exportPath = "Assets/GameAssets/Monsters/";
+        string exportPath = "Assets/Prefabs/Monsters/";
 
-        if (!File.Exists(jsonPath))
-        {
-            Debug.LogError($"Cannot find JSON file at: {jsonPath}");
-            return;
-        }
+        if (!File.Exists(jsonPath)) { Debug.LogError("JSON not found!"); return; }
+        if (!Directory.Exists(exportPath)) { Directory.CreateDirectory(exportPath); }
 
-    string jsonContent = File.ReadAllText(jsonPath);
-    Debug.Log($"File content length: {jsonContent.Length}"); // 2. Is it empty?
-
-        if (!Directory.Exists(exportPath))
-        {
-            Directory.CreateDirectory(exportPath);
-        }
-
+        string jsonContent = File.ReadAllText(jsonPath);
         MonsterDatabase db = JsonConvert.DeserializeObject<MonsterDatabase>(jsonContent);
-
-if (db == null) {
-        Debug.LogError("JSON Deserialization failed! db is null.");
-        return;
-    }
-    
-    if (db.monsters == null) {
-        Debug.LogError("db.monsters array is null! Check your JSON keys.");
-        return;
-    }
-
-    Debug.Log($"Found {db.monsters.Length} monsters to import."); // 4. Does this trigger?
 
         foreach (var record in db.monsters)
         {
-            if (string.IsNullOrEmpty(record.monsterID)) continue;
+            // IMPORTANT: Ensure this matches the key "id" in your JSON
+            if (string.IsNullOrEmpty(record.monsterID)) { Debug.LogWarning("Skipping monster: ID is null/empty"); continue; }
 
             string assetPath = $"{exportPath}{record.monsterID}.asset";
-            Debug.Log($"Checking for asset at: {assetPath}"); // <--- ADD THIS
-            
-            // 1. Try to load existing
             MonsterDefinitionSO asset = AssetDatabase.LoadAssetAtPath<MonsterDefinitionSO>(assetPath);
 
-            // 2. If it doesn't exist, CREATE IT
-        if (asset == null)
-        {
-            asset = ScriptableObject.CreateInstance<MonsterDefinitionSO>();
-            AssetDatabase.CreateAsset(asset, assetPath);
-            
-            // ADD THIS:
-            if (System.IO.File.Exists(assetPath)) {
-                Debug.Log($"SUCCESS: File confirmed on disk at {assetPath}");
-            } else {
-                Debug.LogError($"CRITICAL: File was NOT created on disk at {assetPath}");
+            if (asset == null)
+            {
+                asset = ScriptableObject.CreateInstance<MonsterDefinitionSO>();
+                AssetDatabase.CreateAsset(asset, assetPath);
             }
-}
 
-            // 3. Apply the data (this works whether it's new or old)
             ApplyDataToAsset(asset, record);
-            
-            // 4. Save changes
             EditorUtility.SetDirty(asset);
         }
 
         AssetDatabase.SaveAssets();
         AssetDatabase.Refresh();
-        Debug.Log($"Successfully imported {db.monsters.Length} monsters!");
-}
+        Debug.Log("Import Complete.");
+    }
 
     private static void ApplyDataToAsset(MonsterDefinitionSO asset, MonsterRecord record)
     {
         string spritePath = $"Assets/Art/Monsters/{record.monsterSprite}.png";
         Sprite loadedSprite = AssetDatabase.LoadAssetAtPath<Sprite>(spritePath);
+        List<SkillDefinitionSO> loadedSkills = LoadSkills(record.commandList);
 
-        asset.Editor_ImportData(
-            record.monsterID,
-            record.monsterName,
-            loadedSprite,
-            record.race,
-            record.element,
-            record.baseStats,
-            null,
-            null
-        );
+        if (loadedSprite == null)
+        {
+            Debug.LogWarning($"Importer could not find a Sprite at {spritePath}. Check if the file is marked as 'Sprite (2D and UI)' in Import Settings.");
+        }
+
+        asset.Editor_ImportData(record.monsterID, 
+                                record.monsterName, 
+                                loadedSprite, 
+                                record.race, 
+                                record.element, 
+                                record.baseStats, 
+                                null, 
+                                loadedSkills);
+        Debug.Log($"Successfully applied data to: {record.monsterID}");
+    }
+
+    private static List<SkillDefinitionSO> LoadSkills(string[] skillNames)
+    {
+        List<SkillDefinitionSO> skills = new List<SkillDefinitionSO>();
+        
+        if (skillNames == null) return skills;
+
+        foreach (string skillName in skillNames)
+        {
+            // ASSUMPTION: Your SkillDefinitionSO assets are located in Assets/GameAssets/Skills/
+            string path = $"Assets/Prefabs/SkillData/{skillName}.asset";
+            SkillDefinitionSO skill = AssetDatabase.LoadAssetAtPath<SkillDefinitionSO>(path);
+            
+            if (skill != null)
+            {
+                skills.Add(skill);
+            }
+            else
+            {
+                Debug.LogWarning($"Could not find skill asset at: {path}");
+            }
+        }
+        return skills;
     }
 }

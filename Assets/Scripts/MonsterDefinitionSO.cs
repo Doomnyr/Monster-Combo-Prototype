@@ -61,4 +61,6 @@ public class MonsterDefinitionSO : ScriptableObject
         UnityEditor.EditorUtility.SetDirty(this);
     }
     #endif
+
+    
 }

@@ -32,7 +32,7 @@ public class MonsterRecord
     [SerializeField] public ElementType element;
     [SerializeField] public StatBlock baseStats;
     [SerializeField] public List<TraitDefinitionSO> traits;
-    [SerializeField] public List<SkillDefinitionSO> commandPriorityList = new List<SkillDefinitionSO>();
+    [SerializeField] public string[] commandList;
 }
 
 [Serializable]
