@@ -6,7 +6,6 @@ public struct StatBlock {
     public float defense;
     public float intelligence;
     public float speed;
-
     public float critChance;
     public float critDamageMult;
     public float DodgeChance;

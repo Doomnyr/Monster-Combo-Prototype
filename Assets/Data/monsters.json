@@ -1,0 +1,22 @@
+{
+  "monsters": [
+    {
+      "id": "monster_dragon_001",
+      "name": "Green Dragon",
+      "spriteName": "monster_dragon_001",
+      "race": "Dragon",
+      "element": "Fire",
+      "baseStats": {
+        "maxHP": 500.0,
+        "maxMana": 50.0,
+        "strength": 100.0,
+        "defense": 100.0,
+        "intelligence": 100.0,
+        "speed": 50.0,
+        "dodgeChance": 0.0,
+        "critChance": 0.05,
+        "critDamageMult": 1.5
+      }
+    }
+  ]
+}
