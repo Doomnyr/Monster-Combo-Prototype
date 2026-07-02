@@ -9,7 +9,7 @@ public struct StatBlock {
 
     public float critChance;
     public float critDamageMult;
-    public float DodgeChance;
+    public float dodgeChance;
 }
 
 // Traits

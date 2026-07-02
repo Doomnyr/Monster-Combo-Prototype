@@ -1,0 +1,4 @@
+monsterId,monsterName,monsterSprite,race,element,#Avg Stats,maxHP,maxMana,strength,defense,intelligence,speed,critChance,critDamageMult,dodgeChance,commandList
+m_dragon_green_001,Green Dragon,monster_dragon_001,Dragon,Fire,44.57,500,100,50,25,80,100,0.05,1.5,0,Skill_BurningAssualt|Skill_BasicAttack
+m_human_barb_001,Barbarian,monster_barb_001,Human,Earth,37.07,450,100,75,10,50,60,0.05,1.5,0,Skill_BasicAttack
+m_bird_001,Bird Shaman,monster_bird_001,Bird,Light,34.57,400,100,60,10,50,55,0.05,1.5,0,Skill_BasicAttack

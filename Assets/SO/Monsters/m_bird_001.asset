@@ -10,24 +10,23 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d4d675410e554c346beddfb05de04bff, type: 3}
-  m_Name: m_dragon_green_001
+  m_Name: m_bird_001
   m_EditorClassIdentifier: Assembly-CSharp::MonsterDefinitionSO
-  _monsterID: m_dragon_green_001
-  _monsterName: Green Dragon
-  _monsterSprite: {fileID: 21300000, guid: 9170724eec7838a4ebe29eb1102548f8, type: 3}
-  _race: 3
-  _element: 1
+  _monsterID: m_bird_001
+  _monsterName: Bird Shaman
+  _monsterSprite: {fileID: 21300000, guid: 13e93164b59c51c4ebbc812ce65aacc1, type: 3}
+  _race: 7
+  _element: 4
   _baseStats:
-    maxHP: 500
+    maxHP: 400
     maxMana: 100
-    strength: 50
-    defense: 25
-    intelligence: 80
-    speed: 100
+    strength: 60
+    defense: 10
+    intelligence: 50
+    speed: 55
     critChance: 0.05
     critDamageMult: 1.5
     dodgeChance: 0
   _traits: []
   _commandPriorityList:
-  - {fileID: 11400000, guid: 39cf6c1667ac39e4ebb9759a132d4e7b, type: 2}
   - {fileID: 11400000, guid: 56b40c84422297b4ea99abb68f5dcb1f, type: 2}
