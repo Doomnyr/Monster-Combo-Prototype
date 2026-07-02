@@ -106,9 +106,11 @@ public class CombatManager : MonoBehaviour
 
             foreach (MonsterInstance target in currentActionTargets)
             {
+                foreach (SkillEffectSO effect in action.executionEffect)
+                
                 if (target != null && target.IsAlive)
                 {
-                    action.executionEffect.Apply(action, caster, target);
+                    effect.Apply(action, caster, target);
                 }
             }
 
@@ -125,9 +127,13 @@ public class CombatManager : MonoBehaviour
         
         foreach (MonsterInstance target in targets)
         {
-            if (target != null && target.IsAlive)
+            foreach (SkillEffectSO effect in action.executionEffect)
             {
-                action.executionEffect.Apply(action, caster, target);
+                
+                if (target != null && target.IsAlive)
+                {
+                    effect.Apply(action, caster, target);
+                }
             }
         }
     }

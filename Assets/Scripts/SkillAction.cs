@@ -7,8 +7,8 @@ using UnityEngine;
 public class SkillAction
 {
     public TargetFinderSO targetFinder;
-    public SkillEffectSO executionEffect;
-    public ElementType element = ElementType.None;
+    public List<SkillEffectSO> executionEffect = new List<SkillEffectSO>();
+    public ElementType element = ElementType.None; //Default
 
     // Damage Mod
     public float baseValue;

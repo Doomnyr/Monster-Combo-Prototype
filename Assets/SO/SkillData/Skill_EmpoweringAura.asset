@@ -18,7 +18,8 @@ MonoBehaviour:
   _manaCost: 0
   _actions:
   - targetFinder: {fileID: 11400000, guid: 55b45dbfbb1682d4dad4d80f0d82d4c3, type: 2}
-    executionEffect: {fileID: 11400000, guid: 78b5c7205afd8174c8b69330ed6e87ce, type: 2}
+    executionEffect:
+    - {fileID: 11400000, guid: 78b5c7205afd8174c8b69330ed6e87ce, type: 2}
     element: 6
     baseValue: 0
     scalingStat: 0

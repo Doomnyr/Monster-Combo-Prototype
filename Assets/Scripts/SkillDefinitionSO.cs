@@ -23,6 +23,5 @@ public class SkillDefinitionSO : ScriptableObject
     public string Description => _description;
     public float ManaCost => _manaCost;
     public ElementType Element => _element;
-    
     public List<SkillAction> Actions => _actions; 
 }

@@ -18,7 +18,8 @@ MonoBehaviour:
   _manaCost: 0
   _actions:
   - targetFinder: {fileID: 11400000, guid: 1987b1fcd2d464e418cf9da66e4bcac1, type: 2}
-    executionEffect: {fileID: 11400000, guid: 331bb656d3974d945ac36318f89339a9, type: 2}
+    executionEffect:
+    - {fileID: 11400000, guid: 331bb656d3974d945ac36318f89339a9, type: 2}
     element: 6
     baseValue: 100
     scalingStat: 2
@@ -26,10 +27,11 @@ MonoBehaviour:
     buffToApply: {fileID: 0}
     buffCount: 1
     buffduration: 3
-  - targetFinder: {fileID: 11400000, guid: 1987b1fcd2d464e418cf9da66e4bcac1, type: 2}
-    executionEffect: {fileID: 11400000, guid: 87263a22e0526d84d95a7827b4fd99c8, type: 2}
+  - targetFinder: {fileID: 11400000, guid: 74aee106783430b43b381bdbfd2e1037, type: 2}
+    executionEffect:
+    - {fileID: 11400000, guid: 87263a22e0526d84d95a7827b4fd99c8, type: 2}
     element: 6
-    baseValue: 0
+    baseValue: 0.1
     scalingStat: 0
     scalingCoefficient: 0
     buffToApply: {fileID: 0}
