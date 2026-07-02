@@ -1,59 +1,68 @@
 using UnityEngine;
 using UnityEditor;
-using Newtonsoft.Json;
 using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 
-public static class MonsterDataImporter
+public static class MonsterCSVImporter
 {
-    [MenuItem("Tools/Import Game Data/Monsters")]
-    public static void ImportMonsters()
+    
+    [MenuItem("Tools/Import Game Data/Monsters from local ")]
+    public static void ProcessMonsterData(string csvContent)
     {
-        // 1. Build lookup dictionaries for assets
+        // Build the dictionary here, inside the processing method
         var skillDict = BuildAssetDictionary<SkillDefinitionSO>();
-        // var traitDict = BuildAssetDictionary<TraitDefinitionSO>(); // Uncomment if needed
+        
+        ParseCSV(csvContent, skillDict);
+    }
+    public static void ParseCSV(string csvContent, Dictionary<string, SkillDefinitionSO> skillDict)
+    {
+        string csvPath = Path.Combine(Application.dataPath, "Data/Monsters.csv");
+        //string csvContent = File.ReadAllText(csvPath);
 
-        string jsonPath = Path.Combine(Application.dataPath, "Data/monsters.json");
-        string jsonContent = File.ReadAllText(jsonPath);
+        // FIX: Split content into lines, skip header row
+        string[] lines = csvContent.Split('\n');
 
-        var root = Newtonsoft.Json.Linq.JObject.Parse(jsonContent);
-        var monsterList = root["monsters"];
 
-        foreach (var entry in monsterList)
+    for (int i = 1; i < lines.Length; i++)
         {
-            // Extract raw data
-            string id = entry["monsterId"]?.ToString();
-            string name = entry["monsterName"]?.ToString();
-            string spriteName = entry["monsterSprite"]?.ToString();
+            string line = lines[i];
+            if (string.IsNullOrWhiteSpace(line)) continue; // Skip empty lines
 
-            if (string.IsNullOrEmpty(id)) 
-            {
-                Debug.LogWarning("Found a monster entry in JSON with a missing or null 'id'. Skipping.");
-                continue; 
-            }
+            string[] data = line.Split(',');
             
-            // Handle Enums (Make sure these match your C# Enum names exactly)
-            MonsterRace race = (MonsterRace)System.Enum.Parse(typeof(MonsterRace), entry["race"]?.ToString() ?? "Unknown");
-            ElementType element = (ElementType)System.Enum.Parse(typeof(ElementType), entry["element"]?.ToString() ?? "None");
+            string monsterId = data[0];
+            string monsterName = data[1];
+            string monsterSprite = data[2];
+            string race = data[3];
+            string element = data[4];
 
-            // Handle Stats
-            StatBlock stats = entry["baseStats"]?.ToObject<StatBlock>() ?? new StatBlock();
+            string spritePath = $"Assets/Art/Monsters/{monsterSprite}.png";
+            Sprite loadedSprite = AssetDatabase.LoadAssetAtPath<Sprite>(spritePath);
+            
+            // Stats parsing
+            StatBlock stats = new StatBlock {
+                maxHP = SafeParseFloat(data[6]),
+                maxMana = SafeParseFloat(data[7]),
+                strength = SafeParseFloat(data[8]),
+                defense = SafeParseFloat(data[9]),
+                intelligence = SafeParseFloat(data[10]),
+                speed = SafeParseFloat(data[11]),
+                critChance = SafeParseFloat(data[12]),
+                critDamageMult = SafeParseFloat(data[13]),                
+                dodgeChance = SafeParseFloat(data[14]),
+            };
 
-            // Handle Skill Mapping
             List<SkillDefinitionSO> skills = new List<SkillDefinitionSO>();
-            var skillNames = entry["commandList"]?.ToObject<string[]>();
-            if (skillNames != null)
+            string[] skillNames = data[15].Split('|');
+            foreach (string sName in skillNames)
             {
-                foreach (string sName in skillNames)
-                {
-                    if (skillDict.TryGetValue(sName, out var skill)) skills.Add(skill);
-                    else Debug.LogWarning($"Skill '{sName}' not found for {id}");
-                }
+                if (skillDict.TryGetValue(sName.Trim(), out var skill)) 
+                    skills.Add(skill);
             }
 
-            // Load/Create Asset
-            string assetPath = $"Assets/SO/Monsters/{id}.asset";
+            // Create/Update Asset
+            string assetPath = $"Assets/SO/Monsters/{monsterId}.asset";
             MonsterDefinitionSO asset = AssetDatabase.LoadAssetAtPath<MonsterDefinitionSO>(assetPath);
             if (asset == null)
             {
@@ -61,25 +70,19 @@ public static class MonsterDataImporter
                 AssetDatabase.CreateAsset(asset, assetPath);
             }
 
-            // Load Sprite (Dynamic path lookup)
-            string spritePath = $"Assets/Art/Monsters/{spriteName}.png";
-            Sprite loadedSprite = AssetDatabase.LoadAssetAtPath<Sprite>(spritePath);
-
-            // Populate the asset
-            asset.Editor_ImportData(id, 
-                                    name, 
+            asset.Editor_ImportData(monsterId, 
+                                    monsterName, 
                                     loadedSprite, 
-                                    race, 
-                                    element, 
+                                    (MonsterRace)System.Enum.Parse(typeof(MonsterRace), race), 
+                                    (ElementType)System.Enum.Parse(typeof(ElementType), element),
                                     stats, 
-                                    null, // traits
+                                    null, //traits
                                     skills);
+            
             EditorUtility.SetDirty(asset);
         }
-
         AssetDatabase.SaveAssets();
         AssetDatabase.Refresh();
-        Debug.Log("Monster Import Complete!");
     }
 
     private static Dictionary<string, T> BuildAssetDictionary<T>() where T : UnityEngine.Object
@@ -92,5 +95,16 @@ public static class MonsterDataImporter
             if (asset != null && !dict.ContainsKey(asset.name)) dict.Add(asset.name, asset);
         }
         return dict;
+    }
+
+        private static float SafeParseFloat(string input)
+    {
+        // Trim whitespace and try to parse
+        if (float.TryParse(input.Trim(), out float result))
+        {
+            return result;
+        }
+        Debug.LogWarning($"Could not parse '{input}' as a float. Defaulting to 0.");
+        return 0f;
     }
 }

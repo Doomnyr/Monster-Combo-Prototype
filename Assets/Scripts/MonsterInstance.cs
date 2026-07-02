@@ -48,7 +48,7 @@ public class MonsterInstance : IHealthObservable, IManaObservable, IBuffBarObser
         _cachedSpeed = Buffs.CalculateModifiedStat(StatType.Speed, MonsterDef.BaseStats.speed);
         _cachedCritChance = Buffs.CalculateModifiedStat(StatType.CritChance, MonsterDef.BaseStats.critChance);
         _cachedCritDamageMult = Buffs.CalculateModifiedStat(StatType.CritDamageMult, MonsterDef.BaseStats.critDamageMult);
-        _cachedDodgeChance = Buffs.CalculateModifiedStat(StatType.DodgeChance, MonsterDef.BaseStats.DodgeChance);
+        _cachedDodgeChance = Buffs.CalculateModifiedStat(StatType.DodgeChance, MonsterDef.BaseStats.dodgeChance);
 
         _currentHP = Math.Clamp(_currentHP, 0f, _cachedMaxHP);
         _currentMana = Math.Clamp(_currentMana, 0f, _cachedMaxMana);

@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a157ce9e219e5a8418c99da382804c9e, type: 3}
   m_Name: Skill_BasicAttack
   m_EditorClassIdentifier: Assembly-CSharp::SkillDefinitionSO
-  _name: 
+  _name: Basic Attack
   _description: 
   _element: 0
   _manaCost: 0

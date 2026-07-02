@@ -19,14 +19,14 @@ MonoBehaviour:
   _element: 1
   _baseStats:
     maxHP: 500
-    maxMana: 50
-    strength: 100
-    defense: 100
-    intelligence: 100
-    speed: 50
+    maxMana: 100
+    strength: 50
+    defense: 25
+    intelligence: 80
+    speed: 100
     critChance: 0.05
     critDamageMult: 1.5
-    DodgeChance: 0
+    dodgeChance: 0
   _traits: []
   _commandPriorityList:
   - {fileID: 11400000, guid: 39cf6c1667ac39e4ebb9759a132d4e7b, type: 2}
