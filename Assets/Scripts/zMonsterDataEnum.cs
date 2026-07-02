@@ -30,5 +30,7 @@ public enum MonsterRace {
     Undead,
     Dragon,
     Mech,
-    Elemental
+    Elemental,
+    Human,
+    Bird
 }
