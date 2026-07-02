@@ -7,7 +7,7 @@ using System.Linq;
 public static class MonsterCSVImporter
 {
     
-    [MenuItem("Tools/Import Game Data/Monsters from CSV")]
+    [MenuItem("Tools/Import Game Data/Monsters from local ")]
     public static void ImportMonstersCSV()
     {
         var skillDict = BuildAssetDictionary<SkillDefinitionSO>();
@@ -15,6 +15,7 @@ public static class MonsterCSVImporter
         
         // Read all lines, skip the header (line 0)
         string[] lines = File.ReadAllLines(csvPath).Skip(1).ToArray();
+
 
         foreach (string line in lines)
         {
