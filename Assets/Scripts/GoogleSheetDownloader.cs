@@ -51,7 +51,8 @@ public static class GoogleSheetDownloader
         // Now process the data
         if (downloadedSheets.ContainsKey("Monsters"))
         {
-            MonsterCSVImporter.ImportMonstersCSV();
+            Debug.Log("Importing Monsters...");
+            MonsterCSVImporter.ProcessMonsterData(downloadedSheets["Monsters"]);
         }
         
         Debug.Log("Full Import Complete!");

@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a157ce9e219e5a8418c99da382804c9e, type: 3}
   m_Name: Skill_MightyPunch
   m_EditorClassIdentifier: Assembly-CSharp::SkillDefinitionSO
-  _name: 
+  _name: Mighty Punch
   _description: 
-  _element: 0
+  _element: 4
   _manaCost: 0
   _actions:
   - targetFinder: {fileID: 11400000, guid: 1987b1fcd2d464e418cf9da66e4bcac1, type: 2}

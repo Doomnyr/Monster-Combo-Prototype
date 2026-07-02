@@ -10,21 +10,24 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d4d675410e554c346beddfb05de04bff, type: 3}
-  m_Name: Succubus
+  m_Name: m_knight_holy_001
   m_EditorClassIdentifier: Assembly-CSharp::MonsterDefinitionSO
-  monsterName: Succubus
-  monsterSprite: {fileID: 21300000, guid: d760cca8d060033478aec42510721b60, type: 3}
-  race: 1
-  element: 6
-  baseStats:
+  _monsterID: m_knight_holy_001
+  _monsterName: Holy Knight
+  _monsterSprite: {fileID: 21300000, guid: 69309ecf349a2f04ca4d185c11ccf0f2, type: 3}
+  _race: 6
+  _element: 4
+  _baseStats:
     maxHP: 450
     maxMana: 100
     strength: 50
-    defense: 50
-    intelligence: 100
-    speed: 150
+    defense: 25
+    intelligence: 25
+    speed: 50
     critChance: 0.05
     critDamageMult: 1.5
-    DodgeChance: 0
-  commandPriorityList:
+    dodgeChance: 0
+  _traits: []
+  _commandPriorityList:
+  - {fileID: 11400000, guid: 24d1858fe6bd8844dbcf51d008b8fffd, type: 2}
   - {fileID: 11400000, guid: 56b40c84422297b4ea99abb68f5dcb1f, type: 2}

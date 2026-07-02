@@ -8,19 +8,28 @@ public static class MonsterCSVImporter
 {
     
     [MenuItem("Tools/Import Game Data/Monsters from local ")]
-    public static void ImportMonstersCSV()
+    public static void ProcessMonsterData(string csvContent)
     {
+        // Build the dictionary here, inside the processing method
         var skillDict = BuildAssetDictionary<SkillDefinitionSO>();
-        string csvPath = Path.Combine(Application.dataPath, "Data/Monster Combo - Monster List - Monsters.csv");
         
-        // Read all lines, skip the header (line 0)
-        string[] lines = File.ReadAllLines(csvPath).Skip(1).ToArray();
+        ParseCSV(csvContent, skillDict);
+    }
+    public static void ParseCSV(string csvContent, Dictionary<string, SkillDefinitionSO> skillDict)
+    {
+        string csvPath = Path.Combine(Application.dataPath, "Data/Monsters.csv");
+        //string csvContent = File.ReadAllText(csvPath);
+
+        // FIX: Split content into lines, skip header row
+        string[] lines = csvContent.Split('\n');
 
 
-        foreach (string line in lines)
+    for (int i = 1; i < lines.Length; i++)
         {
+            string line = lines[i];
+            if (string.IsNullOrWhiteSpace(line)) continue; // Skip empty lines
+
             string[] data = line.Split(',');
-            // CSV columns: 0:id, 1:name, 2:spriteName, 3:race, 4:element, 5:maxHP, 6:strength, 7:skillNames
             
             string monsterId = data[0];
             string monsterName = data[1];
@@ -44,12 +53,12 @@ public static class MonsterCSVImporter
                 dodgeChance = SafeParseFloat(data[14]),
             };
 
-            // Skill parsing (splitting the '|' delimited string)
             List<SkillDefinitionSO> skills = new List<SkillDefinitionSO>();
             string[] skillNames = data[15].Split('|');
             foreach (string sName in skillNames)
             {
-                if (skillDict.TryGetValue(sName, out var skill)) skills.Add(skill);
+                if (skillDict.TryGetValue(sName.Trim(), out var skill)) 
+                    skills.Add(skill);
             }
 
             // Create/Update Asset
