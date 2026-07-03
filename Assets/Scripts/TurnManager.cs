@@ -5,7 +5,6 @@ using UnityEngine;
 public class TurnManager
 {
     private Queue<MonsterInstance> _turnQueue = new Queue<MonsterInstance>();
-
     public void Initialize(List<MonsterInstance> playerTeam, List<MonsterInstance> enemyTeam)
     {
         _turnQueue.Clear();

@@ -16,6 +16,11 @@ public class GridSlotUI : MonoBehaviour
     [SerializeField] private GameObject _buffBar; // Must have a Horizontal/Grid Layout Group!
     [SerializeField] private GameObject _buffIconPrefab; // Drag your BuffIconUI prefab here
 
+    [Header("Turn Management Visuals")]
+    [Tooltip("Drag the hollow highlight border image gameobject here")]
+    [SerializeField] private GameObject _turnHighlightOverlay; 
+
+    public MonsterInstance BoundMonster { get; private set; }
     private IHealthObservable boundHealthTarget;
     private IManaObservable boundManaTarget;
     private IBuffBarObservable boundBuffTarget;
@@ -27,6 +32,7 @@ public class GridSlotUI : MonoBehaviour
         nameText.text = displayName;
         _monsterSprite.sprite = sprite;
 
+        BoundMonster = buffTarget as MonsterInstance;
         // Bind Health Pipeline
         boundHealthTarget = healthTarget;
         if (boundHealthTarget != null)
@@ -49,6 +55,16 @@ public class GridSlotUI : MonoBehaviour
         {
             boundBuffTarget.OnBuffsChanged += UpdateBuffVisuals;
             UpdateBuffVisuals(); // Draw them immediately on spawn
+        }
+
+        SetTurnHighlight(false);
+    }
+
+     public void SetTurnHighlight(bool isCurrentTurn)
+    {
+        if (_turnHighlightOverlay != null)
+        {
+            _turnHighlightOverlay.SetActive(isCurrentTurn);
         }
     }
 
@@ -126,6 +142,8 @@ public class GridSlotUI : MonoBehaviour
 
     public void Unbind()
     {
+        BoundMonster = null;
+        
         if (boundHealthTarget != null)
         {
             boundHealthTarget.OnHPChanged -= UpdateHealthVisuals;

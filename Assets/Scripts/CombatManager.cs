@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using Unity.Properties;
 using UnityEngine;
@@ -12,6 +13,7 @@ public class CombatManager : MonoBehaviour
     private TurnManager _turnManager = new TurnManager();
 
     public event Action OnCombatDataReady;
+    public event System.Action<MonsterInstance> OnTurnStarted;
 
     public void PrepareMatch(List<MonsterInstance> readyPlayerTeam, List<MonsterInstance> readyEnemyTeam)
     {
@@ -27,10 +29,14 @@ public class CombatManager : MonoBehaviour
         OnCombatDataReady?.Invoke();
     }
 
-    private void StartMatch() => Debug.Log("CombatManager: Match started!");
+    private void StartMatch()
+    {   
+        Debug.Log("CombatManager: Match started!");
+    }
 
     private void Update()
     {
+
         if (Keyboard.current != null && Keyboard.current.spaceKey.wasPressedThisFrame)
         {
             ExecuteNextTurn();
@@ -69,8 +75,11 @@ public class CombatManager : MonoBehaviour
     private void ExecuteNextTurn()
     {
         MonsterInstance activeMonster = _turnManager.GetNextTurn();
+
         if (activeMonster == null) return;
 
+        OnTurnStarted?.Invoke(activeMonster);
+        
         List<MonsterInstance> battlefield = new List<MonsterInstance>();
         battlefield.AddRange(PlayerTeam);
         battlefield.AddRange(EnemyTeam);
@@ -93,7 +102,6 @@ public class CombatManager : MonoBehaviour
         activeMonster.Buffs.TickDurations();
         _turnManager.RequeueCombatant(activeMonster);
     }
-
     public void ExecuteSkill(SkillDefinitionSO skill, MonsterInstance caster, List<MonsterInstance> battlefield)
     {
         List<MonsterInstance> lastSuccessfulTargets = new List<MonsterInstance>();

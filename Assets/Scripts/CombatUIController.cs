@@ -16,11 +16,13 @@ public class CombatUIController : MonoBehaviour
     private void OnEnable()
     {
         combatManager.OnCombatDataReady += HandleCombatDataReady;
+        combatManager.OnTurnStarted += HandleHighlightTransition;
     }
 
     private void OnDisable()
     {
         combatManager.OnCombatDataReady -= HandleCombatDataReady;
+        combatManager.OnTurnStarted -= HandleHighlightTransition;
     }
 
     private void HandleCombatDataReady()
@@ -63,6 +65,28 @@ public class CombatUIController : MonoBehaviour
 
                 trigger.SetupSlot(monster);
             }
+        }
+    }
+
+    private void HandleHighlightTransition(MonsterInstance currentActiveMonster)
+    {
+        if (currentActiveMonster == null) return;
+
+        Debug.Log("Found target to highlight");
+        foreach (GridSlotUI slot in playerUiSlots)
+        {
+            if (slot == null) continue;
+            // If this slot is representing the active monster, light up the borders!
+            bool isActiveTurnOwner = (slot.BoundMonster == currentActiveMonster);
+            slot.SetTurnHighlight(isActiveTurnOwner);
+        }
+
+        foreach (GridSlotUI slot in enemyUiSlots)
+        {
+            if (slot == null) continue;
+            // If this slot is representing the active monster, light up the borders!
+            bool isActiveTurnOwner = (slot.BoundMonster == currentActiveMonster);
+            slot.SetTurnHighlight(isActiveTurnOwner);
         }
     }
 
