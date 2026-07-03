@@ -66,9 +66,45 @@ public class GridSlotUI : MonoBehaviour
         foreach (var buff in boundBuffTarget.ActiveBuffs)
         {
             GameObject iconObj = Instantiate(_buffIconPrefab, _buffBar.transform);
-            if (iconObj.TryGetComponent<BuffIconUI>(out var iconUI))
+            BuffIconUI iconUI = iconObj.GetComponent<BuffIconUI>();
+            if (iconUI == null)
+            {
+                iconUI = iconObj.GetComponentInChildren<BuffIconUI>();
+            }
+
+            if (iconUI != null)
             {
                 iconUI.Setup(buff.BuffDef, buff.CurrentStacks);
+            }
+            else
+            {
+                // Fallback: if prefab is a simple Image (older prefab), try to set sprite directly
+                var img = iconObj.GetComponent<UnityEngine.UI.Image>() ?? iconObj.GetComponentInChildren<UnityEngine.UI.Image>();
+                if (img != null)
+                {
+                    img.sprite = buff.BuffDef?.buffIcon;
+                    img.gameObject.SetActive(buff.BuffDef?.buffIcon != null);
+                    img.color = buff.BuffDef != null && buff.BuffDef.isDebuff ? new UnityEngine.Color(1f, 0.5f, 0.5f) : UnityEngine.Color.white;
+
+                    // Try to find a TMP text for stacks
+                    var stacksTMP = iconObj.GetComponent<TMPro.TextMeshProUGUI>() ?? iconObj.GetComponentInChildren<TMPro.TextMeshProUGUI>();
+                    if (stacksTMP != null)
+                    {
+                        if (buff.CurrentStacks > 1)
+                        {
+                            stacksTMP.text = buff.CurrentStacks.ToString();
+                            stacksTMP.gameObject.SetActive(true);
+                        }
+                        else
+                        {
+                            stacksTMP.gameObject.SetActive(false);
+                        }
+                    }
+                }
+                else
+                {
+                    Debug.LogWarning("Spawned buff icon prefab does not contain a BuffIconUI or Image component.");
+                }
             }
         }
     }

@@ -23,11 +23,10 @@ MonoBehaviour:
     strength: 50
     defense: 25
     intelligence: 80
-    speed: 100
+    speed: 1200
     critChance: 0.05
     critDamageMult: 1.5
     dodgeChance: 0
   _traits: []
   _commandPriorityList:
-  - {fileID: 11400000, guid: 39cf6c1667ac39e4ebb9759a132d4e7b, type: 2}
-  - {fileID: 11400000, guid: 56b40c84422297b4ea99abb68f5dcb1f, type: 2}
+  - {fileID: 11400000, guid: 420a2d8a1d818d240a25e72995f806df, type: 2}

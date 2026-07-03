@@ -8,7 +8,7 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 8095268076470127620}
+    - component: {fileID: 8095268076470127620}
   - component: {fileID: 3509591460500299622}
   - component: {fileID: 2445604185651563179}
   - component: {fileID: 7502054292740854360}
@@ -72,7 +72,7 @@ MonoBehaviour:
   nameText: {fileID: 6777938717467025447}
   _monsterSprite: {fileID: 3228014186710075500}
   _buffBar: {fileID: 1757172615285102430}
-  _buffIconPrefab: {fileID: 6471478316448169608, guid: 6e4a359c5f4d23041a40d82f07586e9a, type: 3}
+  _buffIconPrefab: {fileID: 7584218528840121437, guid: 4c35018bd9cda474281f39b18eaa4ca2, type: 3}
 --- !u!114 &7502054292740854360
 MonoBehaviour:
   m_ObjectHideFlags: 0
