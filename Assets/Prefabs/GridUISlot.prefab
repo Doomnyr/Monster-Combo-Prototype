@@ -138,8 +138,8 @@ RectTransform:
   - {fileID: 1519179488744370288}
   - {fileID: 665130691176195118}
   - {fileID: 6941739493344216712}
-  - {fileID: 1513419735850036273}
   - {fileID: 5426094563731428994}
+  - {fileID: 1513419735850036273}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
@@ -1120,7 +1120,7 @@ GameObject:
   - component: {fileID: 1277608317601199300}
   - component: {fileID: 5564991492486814372}
   m_Layer: 5
-  m_Name: Panel
+  m_Name: HighlightPanel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1698,7 +1698,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8697917395520856140, guid: dc78f35ead2a2e247be3a4c8d7aff6f8, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

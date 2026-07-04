@@ -39,7 +39,7 @@ public class CombatManager : MonoBehaviour
 
         if (Keyboard.current != null && Keyboard.current.spaceKey.wasPressedThisFrame)
         {
-            ExecuteNextTurn();
+            AdvanceToNextTurn();
         }
     }
 
@@ -72,14 +72,20 @@ public class CombatManager : MonoBehaviour
         foreach (var action in traitActions) ExecuteSkillAction(action, monster, battlefield);
     }
 
-    private void ExecuteNextTurn()
+    public void AdvanceToNextTurn()
+    {
+        StartCoroutine(ExecuteNextTurn());
+    }
+
+    private IEnumerator ExecuteNextTurn()
     {
         MonsterInstance activeMonster = _turnManager.GetNextTurn();
 
-        if (activeMonster == null) return;
+        if (activeMonster == null) yield break;;
 
         OnTurnStarted?.Invoke(activeMonster);
-        
+        yield return new WaitForSeconds(GameManager.TURN_DELAY);
+
         List<MonsterInstance> battlefield = new List<MonsterInstance>();
         battlefield.AddRange(PlayerTeam);
         battlefield.AddRange(EnemyTeam);
@@ -87,7 +93,7 @@ public class CombatManager : MonoBehaviour
         // 1. Turn Start Triggers
         EvaluateAllTriggers(activeMonster, CombatTriggerTime.OnTurnStart, battlefield);
 
-        if (activeMonster.IsDefeated) return;
+        if (activeMonster.IsDefeated) yield break;;
 
         // 2. Execute Primary Skill
         if (activeMonster.MonsterDef.CommandPriorityList.Count > 0)
