@@ -3,14 +3,16 @@ using UnityEngine;
 public class BuffInstance
 {
     public BuffDefinitionSO BuffDef { get; private set; }
+    public MonsterInstance BuffCaster;
     public int CurrentStacks { get; private set; }
-    private bool _isPermanent;
+    public bool IsPermanent;
 
-    public BuffInstance(BuffDefinitionSO definition, int initialStacks, bool isPermanent)
+    public BuffInstance(BuffDefinitionSO definition, int initialStacks, bool isPermanent, MonsterInstance caster)
     {
         BuffDef = definition;
         CurrentStacks = initialStacks;
-        _isPermanent = isPermanent;
+        IsPermanent = isPermanent;
+        BuffCaster = caster;
     }
 
     public void AddStacks(int amount)
@@ -34,11 +36,11 @@ public class BuffInstance
 
     public void Tick()
     {
-        if (!_isPermanent && CurrentStacks > 0)
+        if (!IsPermanent && CurrentStacks > 0)
         {
             CurrentStacks--;
         }
     }
 
-    public bool IsExpired => !_isPermanent && CurrentStacks <= 0;
+    public bool IsExpired => !IsPermanent && CurrentStacks <= 0;
 }

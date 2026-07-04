@@ -12,7 +12,7 @@ public class MonsterBuffCollection
     public event Action<BuffDefinitionSO, int> OnBuffApplied;
     public event Action<BuffDefinitionSO> OnBuffRemoved;
 
-    public void AddBuff(BuffDefinitionSO buffDef, int stacks)
+    public void AddBuff(BuffDefinitionSO buffDef, int stacks, MonsterInstance caster)
     {
         if (buffDef == null) throw new ArgumentNullException(nameof(buffDef));
 
@@ -25,7 +25,7 @@ public class MonsterBuffCollection
         }
         else
         {
-            activeBuffs.Add(new BuffInstance(buffDef, stacks, isPermanent));
+            activeBuffs.Add(new BuffInstance(buffDef, stacks, isPermanent, caster));
         }
 
         OnBuffApplied?.Invoke(buffDef, stacks);
