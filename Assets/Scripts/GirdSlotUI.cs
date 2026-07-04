@@ -2,15 +2,13 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
+[RequireComponent(typeof(RectTransform))]
 public class GridSlotUI : MonoBehaviour
 {
     [Header("UI Components")]
     [SerializeField] private Slider healthSlider;
     [SerializeField] private Slider manaSlider;
-    [SerializeField] private TextMeshProUGUI currentHealthAmount;
-    [SerializeField] private TextMeshProUGUI currentManaAmount;
     [SerializeField] private TextMeshProUGUI nameText;
-    [SerializeField] private Image _monsterSprite;
     
     [Header("Buff Bar")]
     [SerializeField] private GameObject _buffBar; // Must have a Horizontal/Grid Layout Group!
@@ -20,19 +18,41 @@ public class GridSlotUI : MonoBehaviour
     [Tooltip("Drag the hollow highlight border image gameobject here")]
     [SerializeField] private GameObject _turnHighlightOverlay; 
 
+    [Header("Floating Settings")]
+    [Tooltip("The offset distance above the monster's head in world coordinates")]
+    [SerializeField] private Vector3 _worldOffset = new Vector3(0f, 1.5f, 0f);
+
+    // Caches the bound monster reference so we can easily compare who is active
     public MonsterInstance BoundMonster { get; private set; }
+
     private IHealthObservable boundHealthTarget;
     private IManaObservable boundManaTarget;
     private IBuffBarObservable boundBuffTarget;
 
-    public void Bind(string displayName, Sprite sprite, IHealthObservable healthTarget, IManaObservable manaTarget, IBuffBarObservable buffTarget)
+    // Trackers for screen-space following
+    private RectTransform _rectTransform;
+    private Transform _worldTarget;
+    private Camera _mainCamera;
+
+    private void Awake()
+    {
+        _rectTransform = GetComponent<RectTransform>();
+        _mainCamera = Camera.main;
+    }
+
+    /// <summary>
+    /// Binds the UI elements to the monster's statistics and links it to a physical world target to follow.
+    /// </summary>
+    public void Bind(string displayName, Transform worldTarget, IHealthObservable healthTarget, IManaObservable manaTarget, IBuffBarObservable buffTarget)
     {
         Unbind(); 
 
         nameText.text = displayName;
-        _monsterSprite.sprite = sprite;
+        _worldTarget = worldTarget;
 
+        // Cache the concrete monster instance safely using the interface conversion
         BoundMonster = buffTarget as MonsterInstance;
+
         // Bind Health Pipeline
         boundHealthTarget = healthTarget;
         if (boundHealthTarget != null)
@@ -57,10 +77,26 @@ public class GridSlotUI : MonoBehaviour
             UpdateBuffVisuals(); // Draw them immediately on spawn
         }
 
+        // Default the turn highlight to inactive on binding
         SetTurnHighlight(false);
     }
 
-     public void SetTurnHighlight(bool isCurrentTurn)
+    private void LateUpdate()
+    {
+        // If we don't have a physical monster to follow in the world, do nothing
+        if (_worldTarget == null || _mainCamera == null) return;
+
+        // Convert the 3D/2D world-space target position (plus vertical offset) into 2D pixel screen space
+        Vector3 screenPosition = _mainCamera.WorldToScreenPoint(_worldTarget.position + _worldOffset);
+
+        // Update our RectTransform position immediately
+        _rectTransform.position = screenPosition;
+    }
+
+    /// <summary>
+    /// Controls whether the hollow highlight overlay border is active on this slot.
+    /// </summary>
+    public void SetTurnHighlight(bool isCurrentTurn)
     {
         if (_turnHighlightOverlay != null)
         {
@@ -82,68 +118,30 @@ public class GridSlotUI : MonoBehaviour
         foreach (var buff in boundBuffTarget.ActiveBuffs)
         {
             GameObject iconObj = Instantiate(_buffIconPrefab, _buffBar.transform);
-            BuffIconUI iconUI = iconObj.GetComponent<BuffIconUI>();
-            if (iconUI == null)
-            {
-                iconUI = iconObj.GetComponentInChildren<BuffIconUI>();
-            }
-
-            if (iconUI != null)
+            if (iconObj.TryGetComponent<BuffIconUI>(out var iconUI))
             {
                 iconUI.Setup(buff.BuffDef, buff.CurrentStacks);
-            }
-            else
-            {
-                // Fallback: if prefab is a simple Image (older prefab), try to set sprite directly
-                var img = iconObj.GetComponent<UnityEngine.UI.Image>() ?? iconObj.GetComponentInChildren<UnityEngine.UI.Image>();
-                if (img != null)
-                {
-                    img.sprite = buff.BuffDef?.buffIcon;
-                    img.gameObject.SetActive(buff.BuffDef?.buffIcon != null);
-                    img.color = buff.BuffDef != null && buff.BuffDef.isDebuff ? new UnityEngine.Color(1f, 0.5f, 0.5f) : UnityEngine.Color.white;
-
-                    // Try to find a TMP text for stacks
-                    var stacksTMP = iconObj.GetComponent<TMPro.TextMeshProUGUI>() ?? iconObj.GetComponentInChildren<TMPro.TextMeshProUGUI>();
-                    if (stacksTMP != null)
-                    {
-                        if (buff.CurrentStacks > 1)
-                        {
-                            stacksTMP.text = buff.CurrentStacks.ToString();
-                            stacksTMP.gameObject.SetActive(true);
-                        }
-                        else
-                        {
-                            stacksTMP.gameObject.SetActive(false);
-                        }
-                    }
-                }
-                else
-                {
-                    Debug.LogWarning("Spawned buff icon prefab does not contain a BuffIconUI or Image component.");
-                }
             }
         }
     }
 
-    // ... [UpdateHealthVisuals and UpdateManaVisuals remain exactly the same] ...
     private void UpdateHealthVisuals(float currentHP, float maxHP)
     {
         healthSlider.maxValue = maxHP;
         healthSlider.value = currentHP;
-        currentHealthAmount.text = currentHP.ToString();
     }
 
     private void UpdateManaVisuals(float currentMana, float maxMana)
     {
         manaSlider.maxValue = maxMana;
         manaSlider.value = currentMana;
-        currentManaAmount.text = currentMana.ToString();
     }
 
     public void Unbind()
     {
         BoundMonster = null;
-        
+        _worldTarget = null;
+
         if (boundHealthTarget != null)
         {
             boundHealthTarget.OnHPChanged -= UpdateHealthVisuals;

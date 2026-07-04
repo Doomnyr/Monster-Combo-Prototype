@@ -15,6 +15,7 @@ public class CombatLoader : MonoBehaviour
     [Header("Dependencies")]
     [Tooltip("The engine that will execute the combat rules once data is ready.")]
     [SerializeField] private CombatManager _combatManager;
+    [SerializeField] private CombatUIController _combatUIController;
     
     [Header("Team Configurations")]
     [SerializeField] private List<TeamSlotConfiguration> _playerTeam; 
@@ -30,7 +31,9 @@ public class CombatLoader : MonoBehaviour
         List<MonsterInstance> activePlayerTeam = HydrateTeam(_playerTeam, CombatTeam.Player);
         List<MonsterInstance> activeEnemyTeam = HydrateTeam(_enemyTeam, CombatTeam.Enemy);
 
+    
         _combatManager?.PrepareMatch(activePlayerTeam, activeEnemyTeam);
+        _combatUIController.PopulateBattlefield(activePlayerTeam, activeEnemyTeam);
 
     List<MonsterInstance> HydrateTeam(List<TeamSlotConfiguration> setupSlots, CombatTeam team)
     {
