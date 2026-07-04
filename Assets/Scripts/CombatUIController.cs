@@ -117,7 +117,7 @@ public class CombatUIController : MonoBehaviour
         }
     }
 
-        private void SpawnTeamVisuals2(List<MonsterInstance> team, Vector3 basePos, bool isPlayerTeam)
+    private void SpawnTeamVisuals2(List<MonsterInstance> team, Vector3 basePos, bool isPlayerTeam)
     {
         // 1. Resolve or create clean parent folders in your Hierarchy to avoid scene clutter
         Transform targetParent = isPlayerTeam ? _playerTeamParent : _enemyTeamParent;
