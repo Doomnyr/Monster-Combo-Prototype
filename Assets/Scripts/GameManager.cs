@@ -24,4 +24,9 @@ public class GameManager : MonoBehaviour
     {
         SceneManager.LoadScene("CombatScene");
     }
+
+    public void QuitGame()
+    {
+        Application.Quit();
+    }
 }

@@ -11,7 +11,7 @@ public class CombatManager : MonoBehaviour
     public List<MonsterInstance> EnemyTeam { get; private set; } = new List<MonsterInstance>();
 
     private TurnManager _turnManager = new TurnManager();
-
+    private bool _isTurnRunning = false;
     public event Action OnCombatDataReady;
     public event System.Action<MonsterInstance> OnTurnStarted;
 
@@ -20,18 +20,11 @@ public class CombatManager : MonoBehaviour
         PlayerTeam = readyPlayerTeam;
         EnemyTeam = readyEnemyTeam;
 
-        StartMatch();
-        
-        // Use our consolidated trigger evaluator
-        TriggerCombatTriggers(CombatTriggerTime.OnCombatStart);
-        
-        _turnManager.Initialize(PlayerTeam, EnemyTeam);
-        OnCombatDataReady?.Invoke();
-    }
-
-    private void StartMatch()
-    {   
         Debug.Log("CombatManager: Match started!");
+        
+        StartOfCombatTriggers();
+        OrderMonsterInTurnQueue(PlayerTeam, EnemyTeam);
+        OnCombatDataReady?.Invoke();
     }
 
     private void Update()
@@ -43,9 +36,24 @@ public class CombatManager : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Consolidated trigger system: Polls buffs and traits for any monster on the battlefield.
-    /// </summary>
+    private void StartOfCombatTriggers()
+    {
+        TriggerCombatTriggers(CombatTriggerTime.OnCombatStart);
+    }
+
+    private void OrderMonsterInTurnQueue(List<MonsterInstance> playerTeam, List<MonsterInstance> enemyTeam)
+    {
+        _turnManager.Initialize(playerTeam, enemyTeam);
+    }
+
+    public void AdvanceToNextTurn()
+    {
+        if(!_isTurnRunning)
+        {
+            StartCoroutine(ExecuteNextTurn());
+        }
+    }
+
     private void TriggerCombatTriggers(CombatTriggerTime triggerTime)
     {
         List<MonsterInstance> allMonsters = new List<MonsterInstance>();
@@ -58,9 +66,6 @@ public class CombatManager : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Runs all actions (Buffs + Traits) for a specific monster at a specific timing.
-    /// </summary>
     private void EvaluateAllTriggers(MonsterInstance monster, CombatTriggerTime triggerTime, List<MonsterInstance> battlefield)
     {
         // 1. Buff Actions (Accessing via Buffs collection directly)
@@ -72,16 +77,16 @@ public class CombatManager : MonoBehaviour
         foreach (var action in traitActions) ExecuteSkillAction(action, monster, battlefield);
     }
 
-    public void AdvanceToNextTurn()
-    {
-        StartCoroutine(ExecuteNextTurn());
-    }
-
     private IEnumerator ExecuteNextTurn()
     {
+        _isTurnRunning = true;
         MonsterInstance activeMonster = _turnManager.GetNextTurn();
 
-        if (activeMonster == null) yield break;;
+        if (activeMonster == null || !activeMonster.IsAlive)
+        {
+            _isTurnRunning = false;
+            yield break;
+        }
 
         OnTurnStarted?.Invoke(activeMonster);
         yield return new WaitForSeconds(GameManager.TURN_DELAY);
@@ -93,13 +98,14 @@ public class CombatManager : MonoBehaviour
         // 1. Turn Start Triggers
         EvaluateAllTriggers(activeMonster, CombatTriggerTime.OnTurnStart, battlefield);
 
-        if (activeMonster.IsDefeated) yield break;;
-
         // 2. Execute Primary Skill
         if (activeMonster.MonsterDef.CommandPriorityList.Count > 0)
         {
             ExecuteSkill(activeMonster.MonsterDef.CommandPriorityList[0], activeMonster, battlefield);
         }
+
+        // Add animation here
+        // yield return new WaitForSeconds(0.5f);
 
         // 3. Turn End Triggers
         EvaluateAllTriggers(activeMonster, CombatTriggerTime.OnTurnEnd, battlefield);
@@ -107,6 +113,8 @@ public class CombatManager : MonoBehaviour
         // 4. Cleanup (Accessing Buffs collection directly)
         activeMonster.Buffs.TickDurations();
         _turnManager.RequeueCombatant(activeMonster);
+
+        _isTurnRunning = false;
     }
     public void ExecuteSkill(SkillDefinitionSO skill, MonsterInstance caster, List<MonsterInstance> battlefield)
     {
@@ -143,7 +151,6 @@ public class CombatManager : MonoBehaviour
         {
             foreach (SkillEffectSO effect in action.executionEffect)
             {
-                
                 if (target != null && target.IsAlive)
                 {
                     effect.Apply(action, caster, target);

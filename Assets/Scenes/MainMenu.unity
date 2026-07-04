@@ -503,7 +503,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 64ba9d52b0e3c5f4fb04452e3af4d92f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MenuParallax
-  parallaxEffectMultiplier: 0
+  parallaxEffectMultiplier: 0.01
   smoothTime: 0.3
 --- !u!1 &264100365
 GameObject:
