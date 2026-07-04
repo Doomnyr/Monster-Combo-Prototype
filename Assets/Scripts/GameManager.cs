@@ -1,11 +1,11 @@
 using System.Collections;
-using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
     public static GameManager instance;
-    public static float TURN_DELAY = 2.0f;
+    public static float TURN_DELAY = 1.0f;
 
     void Awake()
     {
@@ -25,5 +25,10 @@ public class GameManager : MonoBehaviour
             instance = this;
             DontDestroyOnLoad(gameObject);
         }
+    }
+
+    public void LoadCombatScene()
+    {
+        SceneManager.LoadScene("CombatScene");
     }
 }
