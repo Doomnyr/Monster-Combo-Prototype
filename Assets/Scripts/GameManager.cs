@@ -20,6 +20,11 @@ public class GameManager : MonoBehaviour
         gameObject.SetActive(true);
     }
 
+    public void Start()
+    {
+        // MusicManager.Instance.PlayMusic("Main Menu");
+    }
+
     public void LoadCombatScene()
     {
         SceneManager.LoadScene("CombatScene");
