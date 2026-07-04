@@ -4,27 +4,20 @@ using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
-    public static GameManager instance;
+    public static GameManager Instance;
     public static float TURN_DELAY = 1.0f;
 
     void Awake()
     {
-
-        ManageSingleton();
-    }
-
-    void ManageSingleton()
-    {
-        if (instance != null)
+        if (Instance != null && Instance != this)
         {
-            gameObject.SetActive(false);
             Destroy(gameObject);
+            return;
         }
-        else
-        {
-            instance = this;
-            DontDestroyOnLoad(gameObject);
-        }
+
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
+        gameObject.SetActive(true);
     }
 
     public void LoadCombatScene()
