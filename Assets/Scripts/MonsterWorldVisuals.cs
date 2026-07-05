@@ -9,9 +9,13 @@ public class MonsterWorldVisuals : MonoBehaviour, IPointerEnterHandler, IPointer
     [Tooltip("Force the sprite to scale uniformly to fit within this bounding box in Unity World Space")]
     [SerializeField] private Vector2 _targetBoxSize = new Vector2(2f, 2f);
     [SerializeField] private bool _enableAutoScaling = true;
+    [SerializeField] private Transform _HUDAnchor;
     private SpriteRenderer _spriteRenderer;
     private BoxCollider2D _collider;
     private MonsterInstance _trackedMonster;
+
+    public Transform HudAnchor => _HUDAnchor;
+
     private void Awake()
     {
         _spriteRenderer = GetComponent<SpriteRenderer>();
@@ -50,6 +54,12 @@ public class MonsterWorldVisuals : MonoBehaviour, IPointerEnterHandler, IPointer
                 }
 
                  _collider.size = _spriteRenderer.sprite.bounds.size;
+            }
+
+            MonsterCombatVisuals combatVisuals = GetComponent<MonsterCombatVisuals>();
+            if (combatVisuals != null)
+            {
+                combatVisuals.SetupVisuals(monster);
             }
         }
     }

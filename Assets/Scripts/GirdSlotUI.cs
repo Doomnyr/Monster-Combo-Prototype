@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
+[ExecuteAlways] // Force this script to run in the Editor without clicking Play!
 [RequireComponent(typeof(RectTransform))]
 public class GridSlotUI : MonoBehaviour
 {
@@ -10,6 +11,10 @@ public class GridSlotUI : MonoBehaviour
     [SerializeField] private Slider manaSlider;
     [SerializeField] private TextMeshProUGUI nameText;
     
+    [Header("In-Editor Preview Target")]
+    [Tooltip("Drag your HUDAnchor from the Scene View here to see them align live!")]
+    [SerializeField] private Transform _hudAnchorTarget;
+
     [Header("Buff Bar")]
     [SerializeField] private GameObject _buffBar; // Must have a Horizontal/Grid Layout Group!
     [SerializeField] private GameObject _buffIconPrefab; // Drag your BuffIconUI prefab here
@@ -83,14 +88,18 @@ public class GridSlotUI : MonoBehaviour
 
     private void LateUpdate()
     {
+        if (_hudAnchorTarget == null) return;
+
         // If we don't have a physical monster to follow in the world, do nothing
         if (_worldTarget == null || _mainCamera == null) return;
 
+        Vector3 worldPosition = _hudAnchorTarget.position;
         // Convert the 3D/2D world-space target position (plus vertical offset) into 2D pixel screen space
         Vector3 screenPosition = _mainCamera.WorldToScreenPoint(_worldTarget.position + _worldOffset);
 
         // Update our RectTransform position immediately
         _rectTransform.position = screenPosition;
+        //_hudAnchorTarget = hudAnchor;
     }
 
     /// <summary>
