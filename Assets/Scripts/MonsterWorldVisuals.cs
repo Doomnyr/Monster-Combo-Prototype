@@ -1,7 +1,6 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-[RequireComponent(typeof(SpriteRenderer))]
 [RequireComponent(typeof(BoxCollider2D))] // Required to capture mouse hovering in World Space!
 public class MonsterWorldVisuals : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
@@ -10,7 +9,7 @@ public class MonsterWorldVisuals : MonoBehaviour, IPointerEnterHandler, IPointer
     [SerializeField] private Vector2 _targetBoxSize = new Vector2(2f, 2f);
     [SerializeField] private bool _enableAutoScaling = true;
     [SerializeField] private Transform _HUDAnchor;
-    private SpriteRenderer _spriteRenderer;
+    [SerializeField] private SpriteRenderer _spriteRenderer;
     private BoxCollider2D _collider;
     private MonsterInstance _trackedMonster;
 
@@ -18,7 +17,6 @@ public class MonsterWorldVisuals : MonoBehaviour, IPointerEnterHandler, IPointer
 
     private void Awake()
     {
-        _spriteRenderer = GetComponent<SpriteRenderer>();
         _collider = GetComponent<BoxCollider2D>();
         _collider.isTrigger = true;
     }
