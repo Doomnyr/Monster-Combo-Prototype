@@ -41,7 +41,6 @@ public class GridSlotUI : MonoBehaviour
 
     private void Awake()
     {
-        _rectTransform = GetComponent<RectTransform>();
         _mainCamera = Camera.main;
     }
 
@@ -86,25 +85,6 @@ public class GridSlotUI : MonoBehaviour
         SetTurnHighlight(false);
     }
 
-    private void LateUpdate()
-    {
-        if (_hudAnchorTarget == null) return;
-
-        // If we don't have a physical monster to follow in the world, do nothing
-        if (_worldTarget == null || _mainCamera == null) return;
-
-        Vector3 worldPosition = _hudAnchorTarget.position;
-        // Convert the 3D/2D world-space target position (plus vertical offset) into 2D pixel screen space
-        Vector3 screenPosition = _mainCamera.WorldToScreenPoint(_worldTarget.position + _worldOffset);
-
-        // Update our RectTransform position immediately
-        _rectTransform.position = screenPosition;
-        //_hudAnchorTarget = hudAnchor;
-    }
-
-    /// <summary>
-    /// Controls whether the hollow highlight overlay border is active on this slot.
-    /// </summary>
     public void SetTurnHighlight(bool isCurrentTurn)
     {
         if (_turnHighlightOverlay != null)

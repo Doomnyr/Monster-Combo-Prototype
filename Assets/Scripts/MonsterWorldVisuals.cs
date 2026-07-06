@@ -24,42 +24,23 @@ public class MonsterWorldVisuals : MonoBehaviour, IPointerEnterHandler, IPointer
     public void Setup(MonsterInstance monster)
     {
         _trackedMonster = monster;
+        _spriteRenderer.sprite = _trackedMonster.MonsterDef.MonsterSprite; 
+        
+        // Get the current size of the sprite in units
+        Vector2 spriteSize = _spriteRenderer.sprite.bounds.size;
 
-        if (_trackedMonster != null && _trackedMonster.MonsterDef != null)
+        // Calculate the scale needed to fit the largest dimension into the target size
+        float scaleFactor = 2 / Mathf.Max(spriteSize.x, spriteSize.y);
+
+        // Apply the uniform scale
+        _spriteRenderer.transform.localScale = new Vector3(scaleFactor, scaleFactor, 1f);
+
+        MonsterCombatVisuals combatVisuals = GetComponent<MonsterCombatVisuals>();
+        if (combatVisuals != null)
         {
-             _spriteRenderer.sprite = _trackedMonster.MonsterDef.MonsterSprite; 
-            
-            if (_spriteRenderer.sprite != null)
-            {
-                if (_enableAutoScaling)
-                {
-                    // Get raw size of the sprite asset in world units
-                    float rawWidth = _spriteRenderer.sprite.bounds.size.x;
-                    float rawHeight = _spriteRenderer.sprite.bounds.size.y;
-
-                    if (rawWidth > 0 && rawHeight > 0)
-                    {
-                        // Calculate scaling factors for both width and height
-                        float scaleX = _targetBoxSize.x / rawWidth;
-                        float scaleY = _targetBoxSize.y / rawHeight;
-                                            
-                        // Choose the smaller scale factor to ensure it fits completely within the target box
-                        // while maintaining the correct aspect ratio (avoiding squishing or stretching)
-                        float uniformScale = Mathf.Min(scaleX, scaleY);
-                                            
-                        transform.localScale = new Vector3(uniformScale, uniformScale, 1f);
-                    }
-                }
-
-                 _collider.size = _spriteRenderer.sprite.bounds.size;
-            }
-
-            MonsterCombatVisuals combatVisuals = GetComponent<MonsterCombatVisuals>();
-            if (combatVisuals != null)
-            {
-                combatVisuals.SetupVisuals(monster);
-            }
+            combatVisuals.SetupVisuals(monster);
         }
+        
     }
 
     public void OnPointerEnter(PointerEventData eventData)

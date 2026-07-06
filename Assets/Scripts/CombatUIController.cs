@@ -111,13 +111,13 @@ public class CombatUIController : MonoBehaviour
 
                 // Setup visuals and scaling
                 worldVisual.Setup(monster);
+                _worldVisualsMap[monster] = worldVisual;
 
-                // Spawn HUD follower
+                GridSlotUI gridSlot = spawnedGo.GetComponentInChildren<GridSlotUI>();
+                
                 if (_healthBarPrefab != null && _hudParent != null)
                 {
-                    GameObject hudGo = Instantiate(_healthBarPrefab, _hudParent);
-                    GridSlotUI gridSlot = hudGo.GetComponent<GridSlotUI>();
-                    
+                                    
                     if (gridSlot != null)
                     {
                         // Bind HUD to the monster's HUDAnchor transform
@@ -132,11 +132,11 @@ public class CombatUIController : MonoBehaviour
                     else
                     {
                         Debug.LogError($"[CombatUIController] HUD Prefab is missing 'GridSlotUI'!", _healthBarPrefab);
-                        Destroy(hudGo);
+                        Destroy(this);
                     }
-                }
+                } 
 
-                _worldVisualsMap[monster] = worldVisual;
+                
             }
             catch (Exception ex)
             {
