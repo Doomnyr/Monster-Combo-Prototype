@@ -1,0 +1,9 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI%20Toolkit/HeaderBar.uss?fileID=7433441132597879392&amp;guid=52137c73ecba0394090de62e727177d7&amp;type=3#HeaderBar"/>
+    <ui:VisualElement style="flex-grow: 1; position: absolute; height: 30px; width: 100%; left: 0; right: 0; top: 0%; background-color: rgba(0, 0, 29, 0.922); justify-content: flex-start; aspect-ratio: auto;">
+        <ui:VisualElement name="VisualElement" style="flex-grow: 1;">
+            <ui:Image name="Image"/>
+            <ui:Label text="Label" name="Label" style="background-color: rgba(255, 255, 255, 0); -unity-text-outline-color: rgb(0, 0, 0); color: rgb(255, 255, 255);"/>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>
