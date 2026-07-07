@@ -1,62 +1,61 @@
 using UnityEngine;
 using TMPro;
 
+[RequireComponent(typeof(RectTransform))]
 public class FloatingText : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI textMesh;
     [SerializeField] private UnityEngine.UI.Image iconImage;
     
-    [Header("Movement Settings")]
+    [Header("UI Drifting Speed")]
+    [Tooltip("Speed to float upward in Canvas local pixels per second")]
+    [SerializeField] private float driftSpeedY = 60f;
     [SerializeField] private float lifetime = 1.0f;
-    [SerializeField] private Vector2 moveSpeedRangeY = new Vector2(50f, 100f);
     
-    [Header("Bounce/Scale Curve")]
+    [Header("Curves")]
     [SerializeField] private AnimationCurve scaleCurve = AnimationCurve.EaseInOut(0, 0, 1, 1);
     [SerializeField] private AnimationCurve alphaCurve = AnimationCurve.EaseInOut(0, 1, 1, 0);
 
+    private RectTransform _rectTransform;
     private float _elapsedTime;
-    private Vector2 _currentMoveSpeed;
     private Color _baseColor;
 
     private void Awake()
     {
-        // Automatically looks down into child GameObjects to find the Text Mesh if unassigned!
-        if (textMesh == null)
-        {
-            textMesh = GetComponentInChildren<TextMeshProUGUI>();
-        }
+        _rectTransform = GetComponent<RectTransform>();
 
-        // Automatically looks down into child GameObjects to find the Image component if unassigned!
-        if (iconImage == null)
-        {
-            iconImage = GetComponentInChildren<UnityEngine.UI.Image>();
-        }
+        // Auto-locate missing references in children
+        if (textMesh == null) textMesh = GetComponentInChildren<TextMeshProUGUI>();
+        if (iconImage == null) iconImage = GetComponentInChildren<UnityEngine.UI.Image>();
     }
 
-    public void Setup(string text, Color color, Sprite buffIcon = null)
+    public void Setup(string text, Color color, Sprite iconSprite = null)
     {
-        textMesh.text = text;
-        textMesh.color = color;
-        _baseColor = color;
+        if (textMesh != null)
+        {
+            textMesh.text = text;
+            textMesh.color = color;
+            _baseColor = color;
+        }
 
         if (iconImage != null)
         {
-            if (buffIcon != null)
+            if (iconSprite != null)
             {
-                iconImage.sprite = buffIcon;
+                iconImage.sprite = iconSprite;
                 iconImage.gameObject.SetActive(true);
             }
             else
             {
-                iconImage.gameObject.SetActive(false); // Hide the image container cleanly for normal damage/heals!
+                iconImage.gameObject.SetActive(false); // Hide the icon container for normal damage/heals
             }
         }
 
-        // Determine a clean upward speed
-        _currentMoveSpeed = new Vector2(
-            0f,
-            Random.Range(moveSpeedRangeY.x, moveSpeedRangeY.y)
-        );
+        // Reset local coordinates to center of parent spawn point
+        if (_rectTransform != null)
+        {
+            _rectTransform.anchoredPosition = Vector2.zero;
+        }
 
         _elapsedTime = 0f;
     }
@@ -72,16 +71,22 @@ public class FloatingText : MonoBehaviour
             return;
         }
 
-        // 1. Float straight up
-        transform.Translate(_currentMoveSpeed * Time.deltaTime);
+        // 1. Move upward safely in Canvas Pixel Units (No Worldspace Translate issues!)
+        if (_rectTransform != null)
+        {
+            _rectTransform.anchoredPosition += new Vector2(0f, driftSpeedY * Time.deltaTime);
+        }
 
         // 2. Animate Scale (pop up quickly, then shrink)
         float currentScale = scaleCurve.Evaluate(normalizedTime);
         transform.localScale = Vector3.one * currentScale;
 
-        // 3. Fade Out (Fading both text and the icon simultaneously)
+        // 3. Fade Out Text and Icon
         float currentAlpha = alphaCurve.Evaluate(normalizedTime);
-        textMesh.color = new Color(_baseColor.r, _baseColor.g, _baseColor.b, currentAlpha);
+        if (textMesh != null)
+        {
+            textMesh.color = new Color(_baseColor.r, _baseColor.g, _baseColor.b, currentAlpha);
+        }
         
         if (iconImage != null && iconImage.gameObject.activeSelf)
         {

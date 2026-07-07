@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using Unity.AppUI.UI;
 
 [ExecuteAlways] // Force this script to run in the Editor without clicking Play!
 [RequireComponent(typeof(RectTransform))]
@@ -10,6 +11,8 @@ public class GridSlotUI : MonoBehaviour
     [SerializeField] private Slider healthSlider;
     [SerializeField] private Slider manaSlider;
     [SerializeField] private TextMeshProUGUI nameText;
+    [SerializeField] private TextMeshProUGUI currentHPText;
+    [SerializeField] private TextMeshProUGUI currentManaText;
     
     [Header("In-Editor Preview Target")]
     [Tooltip("Drag your HUDAnchor from the Scene View here to see them align live!")]
@@ -106,7 +109,7 @@ public class GridSlotUI : MonoBehaviour
         // 2. Spawn the new updated icons
         foreach (var buff in boundBuffTarget.ActiveBuffs)
         {
-            GameObject iconObj = Instantiate(_buffIconPrefab, _buffBar.transform);
+            GameObject iconObj = Instantiate(_buffIconPrefab, _buffBar.transform, false);
             if (iconObj.TryGetComponent<BuffIconUI>(out var iconUI))
             {
                 iconUI.Setup(buff.BuffDef, buff.CurrentStacks);
@@ -118,12 +121,14 @@ public class GridSlotUI : MonoBehaviour
     {
         healthSlider.maxValue = maxHP;
         healthSlider.value = currentHP;
+        currentHPText.text = currentHP.ToString();
     }
 
     private void UpdateManaVisuals(float currentMana, float maxMana)
     {
         manaSlider.maxValue = maxMana;
         manaSlider.value = currentMana;
+        currentManaText.text = currentMana.ToString();
     }
 
     public void Unbind()

@@ -3,38 +3,40 @@ using UnityEngine;
 public class MonsterCombatVisuals : MonoBehaviour
 {
     [Header("Prefabs")]
+    [Tooltip("Drag your scale-safe UI FloatingText prefab here.")]
     [SerializeField] private GameObject floatingTextPrefab;
-    [SerializeField] private Transform textSpawnPoint; // Where text pops up (usually slightly above the slot)
+    
+    [Tooltip("Drag the child 'FloatingCombatText' GameObject from under your nested canvas here.")]
+    [SerializeField] private Transform textSpawnPoint;
 
     [Header("Color Schemes")]
     [SerializeField] private Color damageColor = Color.red;
     [SerializeField] private Color healColor = Color.green;
     [SerializeField] private Color buffColor = Color.cyan;
-    [SerializeField] private Color debuffColor = new Color(0.7f, 0.2f, 1f); // Purple
+    [SerializeField] private Color debuffColor = new Color(0.7f, 0.2f, 1f);
 
     private MonsterInstance _trackedMonster;
 
     public void SetupVisuals(MonsterInstance monster)
     {
-        // Unsubscribe from previous monster events to prevent memory leaks if slots are reused
         Cleanup();
-
         _trackedMonster = monster;
 
         if (_trackedMonster != null)
         {
-            // Subscribe to the new events we made!
             _trackedMonster.OnDamageTaken += SpawnDamageText;
             _trackedMonster.OnHealed += SpawnHealText;
-            _trackedMonster.Buffs.OnBuffApplied += SpawnBuffAppliedText;
-            _trackedMonster.Buffs.OnBuffRemoved += SpawnBuffRemovedText;
+
+            // Hook up buff collections directly
+            if (_trackedMonster.Buffs != null)
+            {
+                _trackedMonster.Buffs.OnBuffApplied += SpawnBuffAppliedText;
+                _trackedMonster.Buffs.OnBuffRemoved += SpawnBuffRemovedText;
+            }
         }
     }
 
-    private void OnDestroy()
-    {
-        Cleanup();
-    }
+    private void OnDestroy() => Cleanup();
 
     private void Cleanup()
     {
@@ -42,20 +44,17 @@ public class MonsterCombatVisuals : MonoBehaviour
         {
             _trackedMonster.OnDamageTaken -= SpawnDamageText;
             _trackedMonster.OnHealed -= SpawnHealText;
-            _trackedMonster.Buffs.OnBuffApplied -= SpawnBuffAppliedText;
-            _trackedMonster.Buffs.OnBuffRemoved -= SpawnBuffRemovedText;
+            
+            if (_trackedMonster.Buffs != null)
+            {
+                _trackedMonster.Buffs.OnBuffApplied -= SpawnBuffAppliedText;
+                _trackedMonster.Buffs.OnBuffRemoved -= SpawnBuffRemovedText;
+            }
         }
     }
 
-    private void SpawnDamageText(int amount)
-    {
-        CreateFloatingText($"-{amount}", damageColor, null);
-    }
-
-    private void SpawnHealText(int amount)
-    {
-        CreateFloatingText($"+{amount}", healColor, null);
-    }
+    private void SpawnDamageText(int amount) => CreateFloatingText($"-{amount}", damageColor, null);
+    private void SpawnHealText(int amount) => CreateFloatingText($"+{amount}", healColor, null);
 
     private void SpawnBuffAppliedText(BuffDefinitionSO buff, int stacks)
     {    
@@ -72,14 +71,17 @@ public class MonsterCombatVisuals : MonoBehaviour
     private void CreateFloatingText(string message, Color color, Sprite buffIcon)
     {
         if (floatingTextPrefab == null) return;
-
-        // Spawn the text inside the slot's Canvas space
+        
+        // Fallback: use current transform if textSpawnPoint was not specified
         Transform parentTransform = textSpawnPoint != null ? textSpawnPoint : transform;
-        GameObject textInstance = Instantiate(floatingTextPrefab, parentTransform.position, Quaternion.identity, transform.root);
 
-        if (textInstance.TryGetComponent<FloatingText>(out var flText))
+        // CRITICAL FIX: Pass 'false' as the third parameter so the text perfectly
+        // inherits the local Canvas layout bounds and stays proportional!
+        GameObject textObj = Instantiate(floatingTextPrefab, parentTransform, false);
+        
+        if (textObj.TryGetComponent<FloatingText>(out var fText))
         {
-            flText.Setup(message, color, buffIcon);
+            fText.Setup(message, color, buffIcon);
         }
     }
 }
