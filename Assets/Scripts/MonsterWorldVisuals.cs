@@ -40,6 +40,10 @@ public class MonsterWorldVisuals : MonoBehaviour, IPointerEnterHandler, IPointer
         {
             combatVisuals.SetupVisuals(monster);
         }
+        else
+        {
+            Debug.LogWarning($"[MonsterWorldVisuals] No 'MonsterCombatVisuals' script found on {gameObject.name}! Floating numbers will not spawn.", this);
+        }
         
     }
 

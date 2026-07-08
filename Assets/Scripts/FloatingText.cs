@@ -10,7 +10,7 @@ public class FloatingText : MonoBehaviour
     [Header("UI Drifting Speed")]
     [Tooltip("Speed to float upward in Canvas local pixels per second")]
     [SerializeField] private float driftSpeedY = 60f;
-    [SerializeField] private float lifetime = 1.0f;
+    [SerializeField] private float lifetime = 2.0f;
     
     [Header("Curves")]
     [SerializeField] private AnimationCurve scaleCurve = AnimationCurve.EaseInOut(0, 0, 1, 1);
@@ -36,6 +36,7 @@ public class FloatingText : MonoBehaviour
             textMesh.text = text;
             textMesh.color = color;
             _baseColor = color;
+            Debug.Log("Set up floating combat text.");
         }
 
         if (iconImage != null)
