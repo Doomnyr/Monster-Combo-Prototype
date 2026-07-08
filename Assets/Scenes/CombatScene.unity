@@ -1094,7 +1094,8 @@ Transform:
   m_LocalPosition: {x: 2.34831, y: -0.48902, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 1767855229}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1656883894
@@ -1337,7 +1338,7 @@ GameObject:
   - component: {fileID: 1767855229}
   - component: {fileID: 1767855228}
   m_Layer: 0
-  m_Name: background_5_0
+  m_Name: BackgroundImage
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1411,12 +1412,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1767855227}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -2.34831, y: 0.48902, z: 0}
   m_LocalScale: {x: 1.0701, y: 1.0701, z: 1.0701}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 1270671506}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1902922079 stripped
 MonoBehaviour:
@@ -1880,5 +1881,4 @@ SceneRoots:
   - {fileID: 1755254009}
   - {fileID: 1756994207}
   - {fileID: 1270671506}
-  - {fileID: 1767855229}
   - {fileID: 246917624}

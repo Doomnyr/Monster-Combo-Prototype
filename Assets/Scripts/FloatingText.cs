@@ -2,7 +2,7 @@ using UnityEngine;
 using TMPro;
 
 [RequireComponent(typeof(RectTransform))]
-public class FloatingTextController : MonoBehaviour
+public class FloatingText : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI textMesh;
     [SerializeField] private UnityEngine.UI.Image iconImage;
