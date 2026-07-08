@@ -12,6 +12,18 @@ public class MonsterBuffCollection
     public event Action<BuffDefinitionSO, int> OnBuffApplied;
     public event Action<BuffDefinitionSO> OnBuffRemoved;
 
+    [NonSerialized] private MonsterInstance _owner;
+    [NonSerialized] private CombatEventDispatcher _dispatcher;
+
+    public void RegisterCombatEvents(CombatEventDispatcher dispatcher, MonsterInstance owner)
+    {
+        _owner = owner ?? throw new ArgumentNullException(nameof(owner));
+        _dispatcher = dispatcher ?? throw new ArgumentNullException(nameof(dispatcher));
+        dispatcher.TurnStarted += HandleTurnStarted;
+        dispatcher.TurnEnded += HandleTurnEnded;
+        dispatcher.CombatStarted += HandleCombatStarted;
+    }
+
     public void AddBuff(BuffDefinitionSO buffDef, int stacks, MonsterInstance caster)
     {
         if (buffDef == null) throw new ArgumentNullException(nameof(buffDef));
@@ -29,6 +41,7 @@ public class MonsterBuffCollection
         }
 
         OnBuffApplied?.Invoke(buffDef, stacks);
+        //_owner?.OnBuffApplied?.Invoke(buffDef, stacks);
         OnBuffsChanged?.Invoke();
     }
 
@@ -45,15 +58,60 @@ public class MonsterBuffCollection
         }
     }
 
+    private void HandleCombatStarted(CombatStartedEvent combatEvent)
+    {
+        if (combatEvent == null || _owner == null) return;
+        ProcessTriggers(CombatTriggerTime.OnCombatStart, combatEvent.Battlefield);
+    }
+
+    private void HandleTurnStarted(CombatTurnStartedEvent turnEvent)
+    {
+        if (turnEvent == null || _owner == null) return;
+        if (turnEvent.ActiveMonster != _owner) return;
+        ProcessTriggers(CombatTriggerTime.OnTurnStart, turnEvent.Battlefield);
+    }
+
+    private void HandleTurnEnded(CombatTurnEndedEvent turnEvent)
+    {
+        if (turnEvent == null || _owner == null) return;
+        if (turnEvent.ActiveMonster != _owner) return;
+        ProcessTriggers(CombatTriggerTime.OnTurnEnd, turnEvent.Battlefield);
+        TickDurations();
+    }
+
+    private void ProcessTriggers(CombatTriggerTime triggerTime, IReadOnlyList<MonsterInstance> battlefield)
+    {
+        var actionsToRun = GetTriggeredActions(triggerTime);
+        foreach (var action in actionsToRun)
+        {
+            CombatActionExecutor.ExecuteSkillAction(action, _owner, new List<MonsterInstance>(battlefield));
+        }
+    }
+
     public bool RemoveExpiredBuffs()
     {
         int countBefore = activeBuffs.Count;
+        var expiredBuffs = new List<BuffInstance>();
+
+        foreach (var buff in activeBuffs)
+        {
+            if (buff.IsExpired)
+            {
+                expiredBuffs.Add(buff);
+            }
+        }
+
         activeBuffs.RemoveAll(buff => buff.IsExpired);
         
-        if (activeBuffs.Count < countBefore)
+        if (expiredBuffs.Count > 0)
         {
-            // Note: If you need to know exactly which was removed for events,
-            // iterate and check IsExpired before removal.
+            foreach (var expired in expiredBuffs)
+            {
+                OnBuffRemoved?.Invoke(expired.BuffDef);
+                //_owner?.OnBuffRemoved?.Invoke(expired.BuffDef);
+                _dispatcher?.PublishBuffRemoved(_owner, expired.BuffDef);
+            }
+
             OnBuffsChanged?.Invoke();
             return true;
         }
@@ -109,5 +167,11 @@ public class MonsterBuffCollection
 
         float finalValue = (baseValue + flatBonus) * (1f + percentBonus) * multiplier;
         return Mathf.Max(0f, finalValue);
+    }
+
+    public int GetBuffStacks(BuffType buffType)
+    {
+        var buff = activeBuffs.Find(b => b.BuffDef.buffType == buffType);
+        return buff != null ? buff.CurrentStacks : 0;
     }
 }

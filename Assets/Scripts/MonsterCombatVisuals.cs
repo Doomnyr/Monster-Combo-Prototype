@@ -26,13 +26,8 @@ public class MonsterCombatVisuals : MonoBehaviour
         {
             _trackedMonster.OnDamageTaken += SpawnDamageText;
             _trackedMonster.OnHealed += SpawnHealText;
-
-            // Hook up buff collections directly
-            if (_trackedMonster.Buffs != null)
-            {
-                _trackedMonster.Buffs.OnBuffApplied += SpawnBuffAppliedText;
-                _trackedMonster.Buffs.OnBuffRemoved += SpawnBuffRemovedText;
-            }
+            _trackedMonster.OnBuffApplied += SpawnBuffAppliedText;
+            _trackedMonster.OnBuffRemoved += SpawnBuffRemovedText;
         }
     }
 
@@ -44,12 +39,8 @@ public class MonsterCombatVisuals : MonoBehaviour
         {
             _trackedMonster.OnDamageTaken -= SpawnDamageText;
             _trackedMonster.OnHealed -= SpawnHealText;
-            
-            if (_trackedMonster.Buffs != null)
-            {
-                _trackedMonster.Buffs.OnBuffApplied -= SpawnBuffAppliedText;
-                _trackedMonster.Buffs.OnBuffRemoved -= SpawnBuffRemovedText;
-            }
+            _trackedMonster.OnBuffApplied -= SpawnBuffAppliedText;
+            _trackedMonster.OnBuffRemoved -= SpawnBuffRemovedText;
         }
     }
 

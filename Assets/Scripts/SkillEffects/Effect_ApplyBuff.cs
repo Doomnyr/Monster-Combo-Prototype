@@ -8,6 +8,6 @@ public class Effect_ApplyBuff : SkillEffectSO
         if (target.IsDefeated) return;
 
         Debug.Log("EFFECT: Apply Buff");
-        target.Buffs.AddBuff(skill.buffToApply, skill.buffCount, caster);
+        target.ApplyBuff(skill.buffToApply, skill.buffCount, caster);
     }
 }

@@ -21,12 +21,16 @@ public class MonsterInstance : IHealthObservable, IManaObservable, IBuffBarObser
     public event Action<float, float> OnManaChanged;
     public event Action<int> OnDamageTaken;
     public event Action<int> OnHealed;
+    public event Action<BuffDefinitionSO, int> OnBuffApplied;
+    public event Action<BuffDefinitionSO> OnBuffRemoved;
     public event Action OnBuffsChanged;
-    
-    public MonsterBuffCollection Buffs { get; private set; }
-    public IReadOnlyList<BuffInstance> ActiveBuffs => Buffs.ActiveBuffs;
-    //public List<TraitDefinitionSO> Traits { get; private set; }
-    public MonsterTraitCollection Traits { get; private set; }
+
+    [NonSerialized] public CombatEventDispatcher EventDispatcher;
+    [NonSerialized] private MonsterBuffCollection _buffs;
+    public MonsterBuffCollection Buffs => _buffs;
+    public IReadOnlyList<BuffInstance> ActiveBuffs => _buffs.ActiveBuffs;
+    [NonSerialized] private MonsterTraitCollection _traits;
+    public MonsterTraitCollection Traits => _traits;
 
     private float _cachedMaxHP;
     private float _cachedMaxMana;
@@ -93,9 +97,22 @@ public class MonsterInstance : IHealthObservable, IManaObservable, IBuffBarObser
 
     public void TakeDamage(int damageAmount)
     {
-        CurrentHP -= damageAmount;
+        ApplyDamage(damageAmount, null);
+    }
 
+    public void TakeHeal(int healAmount)
+    {
+        ApplyHeal(healAmount, null);
+    }
+
+    public void ApplyDamage(int damageAmount, MonsterInstance source)
+    {
+        if (damageAmount <= 0 || !IsAlive) return;
+
+        CurrentHP -= damageAmount;
         OnDamageTaken?.Invoke(damageAmount);
+        EventDispatcher?.PublishDamageApplied(source, this, damageAmount);
+
         Debug.Log($"{this.MonsterDef.MonsterName} took {damageAmount} damage! Current HP: {CurrentHP}/{MaxHP}");
 
         if (CurrentHP <= 0)
@@ -104,22 +121,29 @@ public class MonsterInstance : IHealthObservable, IManaObservable, IBuffBarObser
         }
     }
 
-    public void TakeHeal(int healAmount)
+    public void ApplyHeal(int healAmount, MonsterInstance source)
     {
-        CurrentHP -= healAmount;
+        if (healAmount <= 0 || !IsAlive) return;
 
+        CurrentHP += healAmount;
         OnHealed?.Invoke(healAmount);
-        Debug.Log($"{this.MonsterDef.MonsterName} was healed {healAmount}! Current HP: {CurrentHP}/{MaxHP}");
 
-        if (CurrentHP <= 0)
-        {
-            Die();
-        }
+        Debug.Log($"{this.MonsterDef.MonsterName} was healed {healAmount}! Current HP: {CurrentHP}/{MaxHP}");
+    }
+
+    public void ApplyBuff(BuffDefinitionSO buffDef, int stacks, MonsterInstance caster)
+    {
+        if (IsDefeated || buffDef == null) return;
+
+        _buffs.AddBuff(buffDef, stacks, caster);
+        OnBuffApplied?.Invoke(buffDef, stacks);
+        EventDispatcher?.PublishBuffApplied(this, buffDef, stacks, caster);
     }
 
     private void Die()
     {
         Debug.Log($"{this.MonsterDef.MonsterName} has fainted!");
+        EventDispatcher?.PublishMonsterDefeated(this);
     }
 
     public MonsterInstance(MonsterDefinitionSO monsterDef, CombatTeam team, GridPosition startingPosition, List<TraitDefinitionSO> traits)
@@ -129,16 +153,24 @@ public class MonsterInstance : IHealthObservable, IManaObservable, IBuffBarObser
         Team = team;
         gridPosition = startingPosition;
 
+        _buffs = new MonsterBuffCollection();
 
-        Buffs = new MonsterBuffCollection();
+        _buffs.OnBuffsChanged += () => OnBuffsChanged?.Invoke();
+        _buffs.OnBuffsChanged += RecalculateDerivedStats;
 
-        Buffs.OnBuffsChanged += () => OnBuffsChanged?.Invoke();
-        Buffs.OnBuffsChanged += RecalculateDerivedStats;
-
-        Traits = new MonsterTraitCollection(traits);
+        _traits = new MonsterTraitCollection(traits);
 
         _currentHP = monsterDef.BaseStats.maxHP;
         _currentMana = monsterDef.BaseStats.maxMana * 0.5f; // Only start with half mana
         RecalculateDerivedStats();
+    }
+
+    public void RegisterCombatEvents(CombatEventDispatcher dispatcher)
+    {
+        if (dispatcher == null) throw new ArgumentNullException(nameof(dispatcher));
+
+        EventDispatcher = dispatcher;
+        Buffs.RegisterCombatEvents(dispatcher, this);
+        Traits.RegisterCombatEvents(dispatcher, this);
     }
 }

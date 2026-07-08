@@ -26,6 +26,11 @@ public class CombatUIController : MonoBehaviour
 
     private readonly Dictionary<MonsterInstance, MonsterWorldVisuals> _worldVisualsMap = new Dictionary<MonsterInstance, MonsterWorldVisuals>();
 
+    public bool TryGetWorldVisual(MonsterInstance monster, out MonsterWorldVisuals worldVisual)
+    {
+        return _worldVisualsMap.TryGetValue(monster, out worldVisual);
+    }
+
     public void PopulateBattlefield(List<MonsterInstance> playerTeam, List<MonsterInstance> enemyTeam)
     {
         _worldVisualsMap.Clear();
@@ -49,7 +54,7 @@ public class CombatUIController : MonoBehaviour
         // 1. Resolve GridManager reference
         if (_gridManager == null)
         {
-            _gridManager = FindFirstObjectByType<GridManager>();
+            _gridManager = FindAnyObjectByType<GridManager>();
             if (_gridManager == null)
             {
                 Debug.LogError("<color=red><b>[CRITICAL]</b></color> GridManager is missing from the Scene! Please create a GridManager GameObject.", this);

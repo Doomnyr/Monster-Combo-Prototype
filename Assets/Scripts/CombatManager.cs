@@ -10,35 +10,43 @@ public class CombatManager : MonoBehaviour
     public List<MonsterInstance> PlayerTeam { get; private set; } = new List<MonsterInstance>();
     public List<MonsterInstance> EnemyTeam { get; private set; } = new List<MonsterInstance>();
 
-    private TurnManager _turnManager = new TurnManager();
+    private readonly TurnManager _turnManager = new TurnManager();
+    private readonly CombatEventDispatcher _eventDispatcher = new CombatEventDispatcher();
     private bool _isTurnRunning = false;
     public event Action OnCombatDataReady;
-    public event System.Action<MonsterInstance> OnTurnStarted;
+    public event Action<MonsterInstance> OnTurnStarted;
+
+    public CombatEventDispatcher EventDispatcher => _eventDispatcher;
 
     public void PrepareMatch(List<MonsterInstance> readyPlayerTeam, List<MonsterInstance> readyEnemyTeam)
     {
         PlayerTeam = readyPlayerTeam;
         EnemyTeam = readyEnemyTeam;
 
+        InitializeMonsterEventSubscriptions(PlayerTeam);
+        InitializeMonsterEventSubscriptions(EnemyTeam);
+
         Debug.Log("CombatManager: Match started!");
         
-        StartOfCombatTriggers();
+        _eventDispatcher.PublishCombatStarted(PlayerTeam, EnemyTeam);
         OrderMonsterInTurnQueue(PlayerTeam, EnemyTeam);
         OnCombatDataReady?.Invoke();
     }
 
+    private void InitializeMonsterEventSubscriptions(List<MonsterInstance> monsters)
+    {
+        foreach (var monster in monsters)
+        {
+            monster.RegisterCombatEvents(_eventDispatcher);
+        }
+    }
+
     private void Update()
     {
-
         if (Keyboard.current != null && Keyboard.current.spaceKey.wasPressedThisFrame)
         {
             AdvanceToNextTurn();
         }
-    }
-
-    private void StartOfCombatTriggers()
-    {
-        TriggerCombatTriggers(CombatTriggerTime.OnCombatStart);
     }
 
     private void OrderMonsterInTurnQueue(List<MonsterInstance> playerTeam, List<MonsterInstance> enemyTeam)
@@ -48,33 +56,10 @@ public class CombatManager : MonoBehaviour
 
     public void AdvanceToNextTurn()
     {
-        if(!_isTurnRunning)
+        if (!_isTurnRunning)
         {
             StartCoroutine(ExecuteNextTurn());
         }
-    }
-
-    private void TriggerCombatTriggers(CombatTriggerTime triggerTime)
-    {
-        List<MonsterInstance> allMonsters = new List<MonsterInstance>();
-        allMonsters.AddRange(PlayerTeam);
-        allMonsters.AddRange(EnemyTeam);
-
-        foreach (var monster in allMonsters)
-        {
-            EvaluateAllTriggers(monster, triggerTime, allMonsters);
-        }
-    }
-
-    private void EvaluateAllTriggers(MonsterInstance monster, CombatTriggerTime triggerTime, List<MonsterInstance> battlefield)
-    {
-        // 1. Buff Actions (Accessing via Buffs collection directly)
-        var buffActions = monster.Buffs.GetTriggeredActions(triggerTime);
-        foreach (var action in buffActions) ExecuteSkillAction(action, monster, battlefield);
-
-        // 2. Trait Actions
-        var traitActions = monster.Traits.GetTriggeredActions(triggerTime);
-        foreach (var action in traitActions) ExecuteSkillAction(action, monster, battlefield);
     }
 
     private IEnumerator ExecuteNextTurn()
@@ -89,33 +74,21 @@ public class CombatManager : MonoBehaviour
         }
 
         OnTurnStarted?.Invoke(activeMonster);
+        var battlefield = BuildBattlefield();
+        _eventDispatcher.PublishTurnStarted(activeMonster, battlefield);
         yield return new WaitForSeconds(GameManager.TURN_DELAY);
 
-        List<MonsterInstance> battlefield = new List<MonsterInstance>();
-        battlefield.AddRange(PlayerTeam);
-        battlefield.AddRange(EnemyTeam);
-
-        // 1. Turn Start Triggers
-        EvaluateAllTriggers(activeMonster, CombatTriggerTime.OnTurnStart, battlefield);
-
-        // 2. Execute Primary Skill
         if (activeMonster.MonsterDef.CommandPriorityList.Count > 0)
         {
             ExecuteSkill(activeMonster.MonsterDef.CommandPriorityList[0], activeMonster, battlefield);
         }
 
-        // Add animation here
-        // yield return new WaitForSeconds(0.5f);
-
-        // 3. Turn End Triggers
-        EvaluateAllTriggers(activeMonster, CombatTriggerTime.OnTurnEnd, battlefield);
-
-        // 4. Cleanup (Accessing Buffs collection directly)
-        activeMonster.Buffs.TickDurations();
+        _eventDispatcher.PublishTurnEnded(activeMonster, battlefield);
         _turnManager.RequeueCombatant(activeMonster);
 
         _isTurnRunning = false;
     }
+
     public void ExecuteSkill(SkillDefinitionSO skill, MonsterInstance caster, List<MonsterInstance> battlefield)
     {
         List<MonsterInstance> lastSuccessfulTargets = new List<MonsterInstance>();
@@ -129,10 +102,11 @@ public class CombatManager : MonoBehaviour
             foreach (MonsterInstance target in currentActionTargets)
             {
                 foreach (SkillEffectSO effect in action.executionEffect)
-                
-                if (target != null && target.IsAlive)
                 {
-                    effect.Apply(action, caster, target);
+                    if (target != null && target.IsAlive)
+                    {
+                        effect.Apply(action, caster, target);
+                    }
                 }
             }
 
@@ -141,21 +115,18 @@ public class CombatManager : MonoBehaviour
                 lastSuccessfulTargets = currentActionTargets;
             }
         }
+
+        if (lastSuccessfulTargets.Count > 0)
+        {
+            _eventDispatcher.PublishSkillExecuted(skill, caster, lastSuccessfulTargets);
+        }
     }
 
-    private void ExecuteSkillAction(SkillAction action, MonsterInstance caster, List<MonsterInstance> battlefield)
+    private List<MonsterInstance> BuildBattlefield()
     {
-        List<MonsterInstance> targets = action.targetFinder.FindTargets(action, caster, battlefield, null);
-        
-        foreach (MonsterInstance target in targets)
-        {
-            foreach (SkillEffectSO effect in action.executionEffect)
-            {
-                if (target != null && target.IsAlive)
-                {
-                    effect.Apply(action, caster, target);
-                }
-            }
-        }
+        List<MonsterInstance> battlefield = new List<MonsterInstance>();
+        battlefield.AddRange(PlayerTeam);
+        battlefield.AddRange(EnemyTeam);
+        return battlefield;
     }
 }

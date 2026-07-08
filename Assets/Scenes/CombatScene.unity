@@ -130,6 +130,7 @@ GameObject:
   - component: {fileID: 124328377}
   - component: {fileID: 124328379}
   - component: {fileID: 124328378}
+  - component: {fileID: 124328380}
   m_Layer: 0
   m_Name: _CombatManager
   m_TagString: Untagged
@@ -228,6 +229,23 @@ MonoBehaviour:
     GridPos:
       Column: 1
       Row: 2
+--- !u!114 &124328380
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 124328376}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3773000d89091d24b8e3539ae65bf958, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CombatFloatingTextManager
+  _combatManager: {fileID: 124328378}
+  _combatUIController: {fileID: 504155570}
+  _floatingTextPrefab: {fileID: 5489755724587463127, guid: 4c86c2cfeaa48d743b402ca7afd6fb64, type: 3}
+  _defaultSpawnParent: {fileID: 1756935687}
+  _uiCamera: {fileID: 409589156}
 --- !u!1 &246917622
 GameObject:
   m_ObjectHideFlags: 0
@@ -369,6 +387,11 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!20 &409589156 stripped
+Camera:
+  m_CorrespondingSourceObject: {fileID: 3998521809542844981, guid: ee0121afee577ef41b12c7b6a88162d7, type: 3}
+  m_PrefabInstance: {fileID: 2316520408356513302}
+  m_PrefabAsset: {fileID: 0}
 --- !u!224 &496313209 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 5223530330183987543, guid: bad26807a0535044ca433f1f83d262be, type: 3}
@@ -1241,6 +1264,7 @@ RectTransform:
   - {fileID: 604177537}
   - {fileID: 496313209}
   - {fileID: 1961759887}
+  - {fileID: 1756935687}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -1248,6 +1272,41 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
+--- !u!1 &1756935686
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1756935687}
+  m_Layer: 5
+  m_Name: FloatingCombatText
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1756935687
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1756935686}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1755254009}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 100, y: 100}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1756994204
 GameObject:
   m_ObjectHideFlags: 0
